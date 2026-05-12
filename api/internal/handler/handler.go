@@ -93,6 +93,7 @@ func (h *Handler) GetIncidents(c *fiber.Ctx) error {
 	provinceID := c.Query("province_id")
 	sortBy := c.Query("sort", "incident_date")
 	order := c.Query("order", "DESC")
+	searchQ := c.Query("q", "")
 
 	if page < 1 {
 		page = 1
@@ -124,6 +125,15 @@ func (h *Handler) GetIncidents(c *fiber.Ctx) error {
 		where += " AND i.province_id = $" + strconv.Itoa(argIdx)
 		pid, _ := strconv.Atoi(provinceID)
 		args = append(args, pid)
+		argIdx++
+	}
+
+	if searchQ != "" {
+		where += " AND (i.title ILIKE $" + strconv.Itoa(argIdx) +
+			" OR i.description ILIKE $" + strconv.Itoa(argIdx) +
+			" OR p.name ILIKE $" + strconv.Itoa(argIdx) +
+			" OR d.name ILIKE $" + strconv.Itoa(argIdx) + ")"
+		args = append(args, "%"+searchQ+"%")
 		argIdx++
 	}
 
