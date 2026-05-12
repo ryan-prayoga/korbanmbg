@@ -1,6 +1,6 @@
 <script lang="ts">
 	import '../app.css';
-	let { children } = $props();
+	let { children, data } = $props();
 </script>
 
 <svelte:head>
@@ -29,6 +29,6 @@
 
 	<footer class="max-w-[960px] mx-auto px-5 py-8 mt-12 border-t border-[#2a2a2a]">
 		<p class="text-[12px] text-[#888] leading-relaxed">Data: KPAI, BGN, JPPI, CISDI, detik.com · Independen, non-partisan</p>
-		<p class="text-[12px] text-[#888] mt-1">Terakhir diperbarui: 12 Mei 2026</p>
+		<p class="text-[12px] text-[#888] mt-1">Diperbarui otomatis setiap hari</p>
 	</footer>
 </div>
