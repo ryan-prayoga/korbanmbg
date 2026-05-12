@@ -6,8 +6,9 @@
 		return n.toLocaleString('id-ID');
 	}
 
-	const kpaiData = stats.aggregate_data?.find((a: any) => a.org === 'KPAI');
-	const maxVictims = Math.max(...(timeline || []).map((t: any) => t.total_victims));
+	// Use deduplicated sum from DB
+	const totalVictims = stats.total_victims;
+	const maxVictims = Math.max(...(timeline || []).map((t: any) => t.total_victims), 1);
 </script>
 
 <svelte:head>
@@ -20,36 +21,41 @@
 	<section class="mb-12">
 		<div class="text-[13px] text-[#888] mb-2 flex items-center gap-2">
 			<span class="text-[10px] bg-[rgba(231,76,60,0.15)] text-[#e74c3c] px-1.5 py-0.5 rounded font-semibold uppercase tracking-wide">Live</span>
-			Data per 12 Mei 2026
+			Data diperbarui otomatis setiap hari
 		</div>
-		<div class="text-[clamp(56px,12vw,96px)] font-extrabold leading-none tracking-tight">
-			12.<span class="text-[#e74c3c]">658</span>
+		<div class="text-[clamp(56px,12vw,96px)] font-extrabold leading-none tracking-tight font-[JetBrains_Mono,monospace]">
+			{fmt(totalVictims)}
 		</div>
 		<p class="text-[15px] text-[#888] mt-3 max-w-[500px]">
-			anak keracunan akibat program Makan Bergizi Gratis di 38 provinsi sepanjang 2025
+			anak keracunan akibat program Makan Bergizi Gratis sejak Januari 2025
 		</p>
-		<span class="inline-block mt-3 text-[11px] font-[JetBrains_Mono,monospace] text-[#888] bg-[#1a1a1a] px-2 py-1 rounded border border-[#2a2a2a]">
-			src: KPAI Laporan Akhir Tahun 2025
-		</span>
+		<div class="flex flex-wrap gap-2 mt-3">
+			<span class="inline-block text-[11px] font-[JetBrains_Mono,monospace] text-[#888] bg-[#1a1a1a] px-2 py-1 rounded border border-[#2a2a2a]">
+				{stats.total_incidents} artikel terdokumentasi
+			</span>
+			<span class="inline-block text-[11px] font-[JetBrains_Mono,monospace] text-[#888] bg-[#1a1a1a] px-2 py-1 rounded border border-[#2a2a2a]">
+				{stats.provinces_affected} provinsi terdampak
+			</span>
+		</div>
 	</section>
 
 	<!-- Stat grid -->
 	<section class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-12">
 		<div class="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-5">
-			<div class="text-[28px] font-bold font-[JetBrains_Mono,monospace]">{fmt(stats.total_incidents)}</div>
-			<div class="text-[12px] text-[#888] mt-1">Insiden terdokumentasi</div>
+			<div class="text-[28px] font-bold font-[JetBrains_Mono,monospace] text-[#e74c3c]">{fmt(totalVictims)}</div>
+			<div class="text-[12px] text-[#888] mt-1">Total korban</div>
+		</div>
+		<div class="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-5">
+			<div class="text-[28px] font-bold font-[JetBrains_Mono,monospace]">{stats.total_incidents}</div>
+			<div class="text-[12px] text-[#888] mt-1">Artikel berita</div>
 		</div>
 		<div class="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-5">
 			<div class="text-[28px] font-bold font-[JetBrains_Mono,monospace]">{stats.provinces_affected}</div>
 			<div class="text-[12px] text-[#888] mt-1">Provinsi terdampak</div>
 		</div>
 		<div class="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-5">
-			<div class="text-[28px] font-bold font-[JetBrains_Mono,monospace]">51</div>
-			<div class="text-[12px] text-[#888] mt-1">Kabupaten/kota</div>
-		</div>
-		<div class="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-5">
-			<div class="text-[28px] font-bold font-[JetBrains_Mono,monospace]">3.309+</div>
-			<div class="text-[12px] text-[#888] mt-1">Korban tambahan 2026</div>
+			<div class="text-[28px] font-bold font-[JetBrains_Mono,monospace]">63</div>
+			<div class="text-[12px] text-[#888] mt-1">Insiden unik</div>
 		</div>
 	</section>
 
@@ -83,17 +89,20 @@
 		</div>
 	</section>
 
-	<!-- Province ranking -->
+	<!-- Province ranking (clickable) -->
 	<section class="mb-12">
 		<div class="flex justify-between items-baseline mb-4">
 			<h2 class="text-[16px] font-semibold">Provinsi Terdampak</h2>
-			<span class="text-[12px] text-[#888]">Top 10</span>
+			<a href="/peta" class="text-[12px] text-[#888] hover:text-[#e74c3c] transition-colors no-underline">Lihat peta →</a>
 		</div>
 		<div class="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg overflow-hidden">
 			{#each (provinces || []).slice(0, 10) as prov, i}
 				{@const maxProv = provinces[0]?.total_victims || 1}
 				{@const pct = (prov.total_victims / maxProv) * 100}
-				<div class="grid grid-cols-[32px_1fr_80px] gap-3 items-center px-5 py-3 border-b border-[#2a2a2a] last:border-b-0 hover:bg-[#242424] transition-colors">
+				<a
+					href="/insiden?province={prov.id}"
+					class="grid grid-cols-[32px_1fr_80px] gap-3 items-center px-5 py-3 border-b border-[#2a2a2a] last:border-b-0 hover:bg-[#242424] transition-colors no-underline text-[#e8e8e8]"
+				>
 					<span class="text-[12px] text-[#888] font-[JetBrains_Mono,monospace] text-right">{i + 1}</span>
 					<div class="flex flex-col gap-1">
 						<span class="text-[13px] font-medium">{prov.name}</span>
@@ -101,10 +110,13 @@
 							<div class="h-full bg-[#e74c3c] rounded-full" style="width: {pct}%"></div>
 						</div>
 					</div>
-					<span class="text-[14px] font-semibold font-[JetBrains_Mono,monospace] text-right text-[#e74c3c]">
-						{fmt(prov.total_victims)}
-					</span>
-				</div>
+					<div class="text-right">
+						<span class="text-[14px] font-semibold font-[JetBrains_Mono,monospace] text-[#e74c3c]">
+							{fmt(prov.total_victims)}
+						</span>
+						<div class="text-[10px] text-[#888]">{prov.incident_count} insiden</div>
+					</div>
+				</a>
 			{/each}
 		</div>
 	</section>
