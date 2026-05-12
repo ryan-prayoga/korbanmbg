@@ -3,51 +3,22 @@
 	let { data } = $props();
 
 	let mapContainer: HTMLDivElement;
+	let selectedProv = $state<{ code: string; name: string; victims: number; incidents: number } | null>(null);
 
-	const districtCoords: Record<string, [number, number]> = {
-		'Bandung Barat': [-6.8575, 107.4669],
-		'Ketapang': [-1.8293, 109.9781],
-		'Surabaya': [-7.2575, 112.7521],
-		'Mojokerto': [-7.4704, 112.4401],
-		'Demak': [-6.8936, 110.6381],
-		'Bogor': [-6.5971, 106.8060],
-		'Agam': [-0.3333, 100.3333],
-		'Klaten': [-7.7056, 110.6042],
-		'Dairi': [2.7500, 98.2167],
-		'Tasikmalaya': [-7.3506, 108.2172],
-		'Jakarta Timur': [-6.2250, 106.9004],
-		'Bantul': [-7.8894, 110.3275],
-		'Sumba': [-9.6500, 119.5000],
-		'Manggarai Barat': [-8.5833, 120.0000],
-		'Kepulauan Anambas': [3.2167, 106.2500],
-		'Tulungagung': [-8.0654, 111.9024],
-		'Majene': [-3.5333, 118.9667],
-		'Lombok Timur': [-8.5500, 116.5500],
-		'Rembang': [-6.7073, 111.3461],
-		'Grobogan': [-7.0247, 110.8672],
-		'Ciamis': [-7.3305, 108.3520],
-		'Kediri': [-7.8160, 112.0178],
-		'Bojonegoro': [-7.1503, 111.8815],
-		'Kupang': [-10.1772, 123.6070],
-		'Bandung': [-6.9175, 107.6191],
-		'Cianjur': [-6.8204, 107.1400],
-		'Kudus': [-6.8048, 110.8405],
-		'Polewali Mandar': [-3.4167, 119.0000],
-		'Sukabumi': [-6.9277, 106.9300],
-		'Sumedang': [-6.8563, 107.9185],
-		'Gunungkidul': [-7.9831, 110.6014],
-		'Garut': [-7.2275, 107.9089],
-		'Kolaka': [-4.0000, 121.5833],
-		'Baubau': [-5.4667, 122.6333],
-		'Landak': [0.3500, 109.6000],
-		'Lamongan': [-7.1199, 112.4171],
-		'Tomohon': [1.3167, 124.8333],
-		'Gorontalo': [0.5333, 123.0667],
-		'Nabire': [-3.3667, 135.5000],
-	};
+	const API_BASE = 'http://127.0.0.1:8090';
 
 	function fmt(n: number): string {
 		return n.toLocaleString('id-ID');
+	}
+
+	// Color scale: white → dark red based on intensity
+	function getColor(intensity: number): string {
+		if (intensity === 0) return '#1a1a1a';
+		if (intensity < 0.1) return '#4a1010';
+		if (intensity < 0.25) return '#7a1515';
+		if (intensity < 0.5) return '#a82020';
+		if (intensity < 0.75) return '#cc2a2a';
+		return '#e74c3c';
 	}
 
 	onMount(async () => {
@@ -55,67 +26,185 @@
 
 		const map = L.map(mapContainer, {
 			zoomControl: false,
+			attributionControl: true,
 		}).setView([-2.5, 118], 5);
 
 		L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-		L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+		L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {
 			attribution: '&copy; OSM &copy; CARTO',
 			maxZoom: 18,
 		}).addTo(map);
 
-		// Group incidents by district
-		const byDistrict: Record<string, { count: number; victims: number; province: string }> = {};
-		for (const inc of data.incidents.data || []) {
-			if (inc.district) {
-				if (!byDistrict[inc.district]) {
-					byDistrict[inc.district] = { count: 0, victims: 0, province: inc.province };
+		let kabLayer: any = null;
+		let provLayer: any = null;
+
+		// --- Load provinces choropleth ---
+		const provRes = await fetch('/api/geodata/provinces.geojson');
+		const provGJ = await provRes.json();
+
+		provLayer = L.geoJSON(provGJ, {
+			style: (feature: any) => ({
+				fillColor: getColor(feature.properties.intensity),
+				fillOpacity: feature.properties.victims > 0 ? 0.75 : 0.2,
+				color: '#333',
+				weight: 0.8,
+				opacity: 0.8,
+			}),
+			onEachFeature: (feature: any, layer: any) => {
+				const p = feature.properties;
+				layer.on({
+					mouseover: (e: any) => {
+						e.target.setStyle({ weight: 2, color: '#e74c3c', fillOpacity: 0.9 });
+					},
+					mouseout: (e: any) => {
+						provLayer.resetStyle(e.target);
+					},
+					click: async (e: any) => {
+						// Update selected province info
+						selectedProv = {
+							code: p.prov_code,
+							name: p.prov_name,
+							victims: p.victims,
+							incidents: p.incidents,
+						};
+
+						// Remove existing kab layer
+						if (kabLayer) map.removeLayer(kabLayer);
+
+						// Zoom to province
+						map.fitBounds(e.target.getBounds(), { padding: [20, 20] });
+
+						// Load kabupaten layer
+						try {
+							const kabRes = await fetch(`/api/geodata/kabupaten/${p.prov_code}.geojson`);
+							if (!kabRes.ok) return;
+							const kabGJ = await kabRes.json();
+
+							kabLayer = L.geoJSON(kabGJ, {
+								style: (feat: any) => ({
+									fillColor: getColor(feat.properties.intensity),
+									fillOpacity: feat.properties.victims > 0 ? 0.8 : 0.15,
+									color: '#555',
+									weight: 0.6,
+									opacity: 0.8,
+								}),
+								onEachFeature: (feat: any, lyr: any) => {
+									const kp = feat.properties;
+									lyr.on({
+										mouseover: (ev: any) => {
+											ev.target.setStyle({ weight: 2, color: '#e74c3c', fillOpacity: 0.95 });
+										},
+										mouseout: (ev: any) => {
+											kabLayer.resetStyle(ev.target);
+										},
+									});
+									if (kp.victims > 0) {
+										lyr.bindPopup(`
+											<div style="font-family:Inter,sans-serif;font-size:12px;line-height:1.6;color:#1a1a1a;min-width:140px">
+												<strong style="font-size:13px">${kp.kab_name}</strong><br>
+												<span style="color:#888">${kp.prov_name}</span><br>
+												<span style="color:#e74c3c;font-weight:700;font-size:16px">${fmt(kp.victims)}</span> korban<br>
+												${kp.incidents} insiden
+											</div>
+										`);
+									} else {
+										lyr.bindTooltip(kp.kab_name, { sticky: true, className: 'kab-tooltip' });
+									}
+								},
+							}).addTo(map);
+						} catch (err) {
+							console.error('Failed to load kabupaten:', err);
+						}
+					},
+				});
+
+				// Tooltip on hover
+				if (p.victims > 0) {
+					layer.bindTooltip(`
+						<strong>${p.prov_name}</strong><br>
+						${fmt(p.victims)} korban · ${p.incidents} insiden
+					`, { sticky: true });
+				} else {
+					layer.bindTooltip(p.prov_name, { sticky: true });
 				}
-				byDistrict[inc.district].count++;
-				byDistrict[inc.district].victims += inc.victim_count;
+			},
+		}).addTo(map);
+
+		// Back button: click on map background resets to province view
+		map.on('click', (e: any) => {
+			if (!e.originalEvent.target.closest('.leaflet-interactive')) {
+				if (kabLayer) {
+					map.removeLayer(kabLayer);
+					kabLayer = null;
+					selectedProv = null;
+					map.setView([-2.5, 118], 5);
+				}
 			}
-		}
-
-		for (const [district, info] of Object.entries(byDistrict)) {
-			const coords = districtCoords[district];
-			if (!coords) continue;
-
-			const radius = Math.max(6, Math.min(28, Math.sqrt(info.victims) * 1.2));
-
-			L.circleMarker(coords, {
-				radius,
-				fillColor: '#e74c3c',
-				color: '#991b1b',
-				weight: 1,
-				opacity: 0.9,
-				fillOpacity: 0.4,
-			})
-				.bindPopup(`
-					<div style="font-family:Inter,sans-serif;font-size:12px;line-height:1.5;color:#1a1a1a">
-						<strong style="font-size:13px">${district}</strong><br>
-						<span style="color:#666">${info.province}</span><br>
-						<span style="color:#e74c3c;font-weight:700;font-size:14px">${fmt(info.victims)}</span> korban<br>
-						${info.count} insiden
-					</div>
-				`)
-				.addTo(map);
-		}
+		});
 	});
 </script>
 
 <svelte:head>
 	<title>Peta Sebaran — KorbanMBG</title>
 	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+	<style>
+		.kab-tooltip { background: #1a1a1a; border: 1px solid #333; color: #e8e8e8; font-size: 11px; }
+		.leaflet-tooltip { background: #1a1a1a; border: 1px solid #333; color: #e8e8e8; font-size: 11px; box-shadow: none; }
+		.leaflet-tooltip::before { border-top-color: #333; }
+	</style>
 </svelte:head>
 
 <main class="max-w-[960px] mx-auto px-5 py-10">
-	<div class="mb-6">
-		<h1 class="text-[16px] font-semibold">Peta Sebaran Korban</h1>
-		<p class="text-[13px] text-[#888] mt-1">Ukuran lingkaran proporsional terhadap jumlah korban. Klik untuk detail.</p>
+	<div class="flex items-start justify-between mb-4 gap-4">
+		<div>
+			<h1 class="text-[16px] font-semibold">Peta Sebaran Korban</h1>
+			<p class="text-[13px] text-[#888] mt-1">
+				{#if selectedProv}
+					Klik kabupaten untuk detail · <button onclick={() => { selectedProv = null; }} class="text-[#e74c3c] hover:underline cursor-pointer bg-transparent border-none p-0">← Kembali ke semua provinsi</button>
+				{:else}
+					Klik provinsi untuk melihat sebaran per kabupaten/kota
+				{/if}
+			</p>
+		</div>
+
+		<!-- Legend -->
+		<div class="shrink-0 bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg px-3 py-2">
+			<div class="text-[10px] text-[#888] mb-1.5 uppercase tracking-wide">Intensitas</div>
+			<div class="flex items-center gap-1">
+				<div class="w-3 h-3 rounded-sm" style="background:#1a1a1a;border:1px solid #333"></div>
+				<div class="w-3 h-3 rounded-sm" style="background:#4a1010"></div>
+				<div class="w-3 h-3 rounded-sm" style="background:#7a1515"></div>
+				<div class="w-3 h-3 rounded-sm" style="background:#a82020"></div>
+				<div class="w-3 h-3 rounded-sm" style="background:#cc2a2a"></div>
+				<div class="w-3 h-3 rounded-sm" style="background:#e74c3c"></div>
+			</div>
+			<div class="flex justify-between text-[9px] text-[#888] mt-0.5">
+				<span>0</span>
+				<span>Maks</span>
+			</div>
+		</div>
 	</div>
 
+	<!-- Selected province info bar -->
+	{#if selectedProv}
+		<div class="bg-[#1a1a1a] border border-[#e74c3c]/30 rounded-lg px-5 py-3 mb-4 flex items-center justify-between">
+			<div>
+				<span class="text-[14px] font-semibold">{selectedProv.name}</span>
+				<span class="text-[#888] text-[13px] ml-3">
+					<span class="text-[#e74c3c] font-bold font-[JetBrains_Mono,monospace]">{fmt(selectedProv.victims)}</span> korban ·
+					{selectedProv.incidents} insiden
+				</span>
+			</div>
+			<a href="/insiden?province={data.provinces.find((p: any) => p.name === selectedProv?.name)?.id || ''}"
+				class="text-[12px] text-[#e74c3c] hover:underline no-underline">
+				Lihat insiden →
+			</a>
+		</div>
+	{/if}
+
 	<div class="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg overflow-hidden mb-8">
-		<div bind:this={mapContainer} class="h-[400px] sm:h-[500px] w-full"></div>
+		<div bind:this={mapContainer} class="h-[450px] sm:h-[550px] w-full"></div>
 	</div>
 
 	<!-- Province table -->
