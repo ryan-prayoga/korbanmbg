@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KorbanMBG — Variant A: Editorial Somber</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --color-bg: #fafaf8;
+  --color-surface: #ffffff;
+  --color-ink: #1a1a1a;
+  --color-muted: #6b6b6b;
+  --color-border: #e5e5e3;
+  --color-accent: #c0392b;
+  --color-accent-soft: #f8e8e6;
+  --font-display: 'Source Serif 4', Georgia, serif;
+  --font-body: 'Inter', -apple-system, sans-serif;
+  --max-w: 720px;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 32px;
+  --space-xl: 48px;
+  --space-2xl: 80px;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--color-bg);
+  color: var(--color-ink);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Nav */
+nav {
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-md) var(--space-lg);
+  position: sticky;
+  top: 0;
+  background: var(--color-bg);
+  z-index: 100;
+}
+nav .inner {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+nav .logo {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--color-ink);
+  text-decoration: none;
+}
+nav .links {
+  display: flex;
+  gap: var(--space-lg);
+}
+nav .links a {
+  font-size: 14px;
+  color: var(--color-muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+nav .links a:hover { color: var(--color-ink); }
+
+/* Hero */
+.hero {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: var(--space-2xl) var(--space-lg) var(--space-xl);
+  text-align: center;
+}
+.hero .kicker {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--color-accent);
+  font-weight: 600;
+  margin-bottom: var(--space-md);
+}
+.hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 5vw, 42px);
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: var(--space-md);
+}
+.hero .subtitle {
+  font-size: 16px;
+  color: var(--color-muted);
+  max-width: 540px;
+  margin: 0 auto;
+}
+
+/* Big number */
+.big-stat {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 0 var(--space-lg) var(--space-xl);
+  text-align: center;
+}
+.big-stat .number {
+  font-family: var(--font-display);
+  font-size: clamp(48px, 10vw, 80px);
+  font-weight: 700;
+  color: var(--color-accent);
+  line-height: 1;
+}
+.big-stat .label {
+  font-size: 14px;
+  color: var(--color-muted);
+  margin-top: var(--space-sm);
+}
+.big-stat .source {
+  font-size: 12px;
+  color: var(--color-muted);
+  margin-top: var(--space-xs);
+  opacity: 0.7;
+}
+
+/* Stats row */
+.stats-row {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: 0 var(--space-lg) var(--space-xl);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-md);
+}
+.stat-item {
+  text-align: center;
+  padding: var(--space-lg) var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background: var(--color-surface);
+}
+.stat-item .num {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+}
+.stat-item .desc {
+  font-size: 12px;
+  color: var(--color-muted);
+  margin-top: var(--space-xs);
+}
+
+/* Timeline section */
+.section {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: var(--space-xl) var(--space-lg);
+  border-top: 1px solid var(--color-border);
+}
+.section h2 {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: var(--space-lg);
+}
+
+/* Bar chart */
+.chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 160px;
+  padding-bottom: var(--space-lg);
+}
+.chart .bar-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: flex-end;
+}
+.chart .bar {
+  width: 100%;
+  background: var(--color-accent);
+  border-radius: 2px 2px 0 0;
+  min-height: 2px;
+  transition: opacity 0.2s;
+  cursor: pointer;
+}
+.chart .bar:hover { opacity: 0.7; }
+.chart .bar-label {
+  font-size: 9px;
+  color: var(--color-muted);
+  margin-top: 6px;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  white-space: nowrap;
+}
+
+/* Incident list */
+.incident-list {
+  list-style: none;
+}
+.incident-list li {
+  padding: var(--space-md) 0;
+  border-bottom: 1px solid var(--color-border);
+  display: grid;
+  grid-template-columns: 60px 1fr auto;
+  gap: var(--space-md);
+  align-items: start;
+}
+.incident-list .date {
+  font-size: 12px;
+  color: var(--color-muted);
+  padding-top: 2px;
+}
+.incident-list .title {
+  font-size: 14px;
+  line-height: 1.4;
+}
+.incident-list .location {
+  font-size: 12px;
+  color: var(--color-muted);
+  margin-top: 2px;
+}
+.incident-list .victims {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-accent);
+  white-space: nowrap;
+}
+
+/* Footer */
+footer {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: var(--space-xl) var(--space-lg);
+  border-top: 1px solid var(--color-border);
+  font-size: 12px;
+  color: var(--color-muted);
+  line-height: 1.8;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .stats-row { grid-template-columns: 1fr; }
+  .incident-list li { grid-template-columns: 1fr auto; }
+  .incident-list .date { display: none; }
+  nav .links { gap: var(--space-md); }
+  nav .links a { font-size: 13px; }
+  .chart .bar-label { display: none; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="inner">
+    <a href="#" class="logo">KorbanMBG</a>
+    <div class="links">
+      <a href="#">Peta</a>
+      <a href="#">Insiden</a>
+      <a href="#">Sumber</a>
+    </div>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="kicker">Pemantauan Independen</div>
+  <h1>Korban Keracunan Program Makan Bergizi Gratis</h1>
+  <p class="subtitle">Dokumentasi kasus keracunan makanan pada program MBG sejak Januari 2025, berdasarkan data lembaga resmi dan pemberitaan media nasional.</p>
+</div>
+
+<div class="big-stat">
+  <div class="number">12.658</div>
+  <div class="label">anak keracunan di 38 provinsi sepanjang 2025</div>
+  <div class="source">Sumber: KPAI (Laporan Akhir Tahun, 15 Januari 2026)</div>
+</div>
+
+<div class="stats-row">
+  <div class="stat-item">
+    <div class="num">460</div>
+    <div class="desc">insiden terdokumentasi</div>
+  </div>
+  <div class="stat-item">
+    <div class="num">19</div>
+    <div class="desc">provinsi terdampak</div>
+  </div>
+  <div class="stat-item">
+    <div class="num">51</div>
+    <div class="desc">kabupaten/kota</div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>Kronologi per Bulan</h2>
+  <div class="chart">
+    <div class="bar-wrap"><div class="bar" style="height:1%"></div><div class="bar-label">Feb 25</div></div>
+    <div class="bar-wrap"><div class="bar" style="height:1%"></div><div class="bar-label">Mei 25</div></div>
+    <div class="bar-wrap"><div class="bar" style="height:1%"></div><div class="bar-label">Jul 25</div></div>
+    <div class="bar-wrap"><div class="bar" style="height:2%"></div><div class="bar-label">Agu 25</div></div>
+    <div class="bar-wrap"><div class="bar" style="height:100%"></div><div class="bar-label">Sep 25</div></div>
+    <div class="bar-wrap"><div class="bar" style="height:89%"></div><div class="bar-label">Okt 25</div></div>
+    <div class="bar-wrap"><div class="bar" style="height:22%"></div><div class="bar-label">Nov 25</div></div>
+    <div class="bar-wrap"><div class="bar" style="height:7%"></div><div class="bar-label">Des 25</div></div>
+    <div class="bar-wrap"><div class="bar" style="height:66%"></div><div class="bar-label">Jan 26</div></div>
+    <div class="bar-wrap"><div class="bar" style="height:60%"></div><div class="bar-label">Feb 26</div></div>
+    <div class="bar-wrap"><div class="bar" style="height:1%"></div><div class="bar-label">Mar 26</div></div>
+    <div class="bar-wrap"><div class="bar" style="height:27%"></div><div class="bar-label">Apr 26</div></div>
+    <div class="bar-wrap"><div class="bar" style="height:59%"></div><div class="bar-label">Mei 26</div></div>
+  </div>
+</div>
+
+<div class="section">
+  <h2>Insiden Terbaru</h2>
+  <ul class="incident-list">
+    <li>
+      <span class="date">12 Mei</span>
+      <div>
+        <div class="title">200 siswa dari 12 sekolah keracunan daging krengsengan MBG</div>
+        <div class="location">Surabaya, Jawa Timur</div>
+      </div>
+      <span class="victims">200</span>
+    </li>
+    <li>
+      <span class="date">9 Mei</span>
+      <div>
+        <div class="title">Korban keracunan MBG di Pulogebang bertambah jadi 252 orang</div>
+        <div class="location">Jakarta Timur, DKI Jakarta</div>
+      </div>
+      <span class="victims">252</span>
+    </li>
+    <li>
+      <span class="date">6 Mei</span>
+      <div>
+        <div class="title">Dinkes ungkap penyebab 500 siswa keracunan MBG</div>
+        <div class="location">Klaten, Jawa Tengah</div>
+      </div>
+      <span class="victims">500</span>
+    </li>
+    <li>
+      <span class="date">30 Apr</span>
+      <div>
+        <div class="title">Korban keracunan MBG di Tulung capai 500 orang</div>
+        <div class="location">Klaten, Jawa Tengah</div>
+      </div>
+      <span class="victims">500</span>
+    </li>
+    <li>
+      <span class="date">28 Apr</span>
+      <div>
+        <div class="title">155 siswa keracunan setelah makan menu MBG</div>
+        <div class="location">Kepulauan Riau</div>
+      </div>
+      <span class="victims">155</span>
+    </li>
+  </ul>
+</div>
+
+<footer>
+  <p>Data dikompilasi dari KPAI, BGN, JPPI, CISDI, dan pemberitaan media nasional (detik.com).</p>
+  <p>Website ini bersifat independen, tidak berafiliasi dengan pemerintah atau partai politik.</p>
+  <p>Terakhir diperbarui: 12 Mei 2026</p>
+</footer>
+
+</body>
+</html>
