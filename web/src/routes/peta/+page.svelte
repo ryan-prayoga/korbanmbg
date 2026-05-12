@@ -137,7 +137,9 @@
 					{#each data.provinces as prov, i}
 						<tr class="border-b border-[#2a2a2a]/50 hover:bg-[#242424] transition-colors">
 							<td class="px-5 py-2.5 text-[#888] font-[JetBrains_Mono,monospace] text-[12px]">{i + 1}</td>
-							<td class="px-5 py-2.5">{prov.name}</td>
+							<td class="px-5 py-2.5">
+								<a href="/insiden?province={prov.id}" class="text-[#e8e8e8] hover:text-[#e74c3c] no-underline transition-colors">{prov.name}</a>
+							</td>
 							<td class="px-5 py-2.5 text-right text-[#e74c3c] font-medium font-[JetBrains_Mono,monospace]">{fmt(prov.total_victims)}</td>
 							<td class="px-5 py-2.5 text-right text-[#888] font-[JetBrains_Mono,monospace]">{prov.incident_count}</td>
 						</tr>
