@@ -54,7 +54,7 @@
 			<div class="text-[12px] text-[#888] mt-1">Provinsi terdampak</div>
 		</div>
 		<div class="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-5">
-			<div class="text-[28px] font-bold font-[JetBrains_Mono,monospace]">63</div>
+			<div class="text-[28px] font-bold font-[JetBrains_Mono,monospace]">{stats.unique_incidents}</div>
 			<div class="text-[12px] text-[#888] mt-1">Insiden unik</div>
 		</div>
 	</section>

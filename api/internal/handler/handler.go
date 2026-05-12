@@ -21,7 +21,8 @@ func (h *Handler) GetStats(c *fiber.Ctx) error {
 	ctx := context.Background()
 
 	var totalIncidents, totalVictims, totalDeaths, totalHospitalized int
-	var provincesAffected int
+	var provincesAffected, uniqueIncidents int
+	var lastUpdated string
 
 	h.db.QueryRow(ctx, `
 		SELECT 
@@ -35,6 +36,15 @@ func (h *Handler) GetStats(c *fiber.Ctx) error {
 	h.db.QueryRow(ctx, `
 		SELECT COUNT(DISTINCT province_id) FROM incidents WHERE province_id IS NOT NULL
 	`).Scan(&provincesAffected)
+
+	h.db.QueryRow(ctx, `
+		SELECT COUNT(*) FROM incidents WHERE victim_count > 0
+	`).Scan(&uniqueIncidents)
+
+	h.db.QueryRow(ctx, `
+		SELECT COALESCE(TO_CHAR(MAX(created_at), 'YYYY-MM-DD HH24:MI'), '')
+		FROM incidents
+	`).Scan(&lastUpdated)
 
 	// Get aggregate data (KPAI, JPPI, etc.)
 	type AggData struct {
@@ -68,6 +78,8 @@ func (h *Handler) GetStats(c *fiber.Ctx) error {
 		"total_deaths":      totalDeaths,
 		"total_hospitalized": totalHospitalized,
 		"provinces_affected": provincesAffected,
+		"unique_incidents":   uniqueIncidents,
+		"last_updated":      lastUpdated,
 		"aggregate_data":    aggregates,
 	})
 }
