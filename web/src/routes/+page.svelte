@@ -12,6 +12,13 @@
 	const totalVictims = headlineFigure ? headlineFigure.total : stats.total_victims;
 	const headlineSource = headlineFigure?.org || 'Data agregasi';
 	const maxVictims = Math.max(...(timeline || []).map((t: any) => t.total_victims), 1);
+
+	const monthNames = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+	function fmtMonth(m: string): string {
+		// "2025-09" → "Sep 25"
+		const [y, mo] = m.split('-');
+		return `${monthNames[parseInt(mo) - 1]} ${y.slice(2)}`;
+	}
 </script>
 
 <svelte:head>
@@ -86,12 +93,12 @@
 						></div>
 						<!-- Tooltip -->
 						<div class="absolute bottom-full mb-2 hidden group-hover:block bg-[#242424] border border-[#2a2a2a] px-2.5 py-1.5 rounded text-[11px] whitespace-nowrap z-10">
-							<div class="font-medium">{entry.month}</div>
+							<div class="font-medium">{fmtMonth(entry.month)}</div>
 							<div class="text-[#e74c3c]">{fmt(entry.total_victims)} korban</div>
 							<div class="text-[#888]">{entry.incident_count} insiden</div>
 						</div>
 						<span class="text-[10px] text-[#888] mt-2 font-[JetBrains_Mono,monospace] hidden sm:block">
-							{entry.month.slice(2)}
+							{fmtMonth(entry.month)}
 						</span>
 					</div>
 				{/each}
