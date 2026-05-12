@@ -56,8 +56,12 @@ func main() {
 	api.Get("/timeline", h.GetTimeline)
 	api.Get("/sources", h.GetSources)
 
-	// GeoJSON endpoints
+	// GeoJSON endpoints (both paths for compatibility)
 	app.Static("/geodata", "/home/ubuntu/projects/korbanmbg/geodata/processed", fiber.Static{
+		Compress: true,
+		Browse:   false,
+	})
+	app.Static("/api/geodata", "/home/ubuntu/projects/korbanmbg/geodata/processed", fiber.Static{
 		Compress: true,
 		Browse:   false,
 	})
