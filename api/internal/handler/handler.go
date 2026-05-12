@@ -33,6 +33,18 @@ func (h *Handler) GetStats(c *fiber.Ctx) error {
 		FROM incidents
 	`).Scan(&totalIncidents, &totalVictims, &totalDeaths, &totalHospitalized)
 
+	// Use deduplicated total: MAX victim_count per (province, district, month) cluster
+	h.db.QueryRow(ctx, `
+		SELECT COALESCE(SUM(max_vc), 0) FROM (
+			SELECT province_id, district_id,
+				   TO_CHAR(incident_date, 'YYYY-MM') as month,
+				   MAX(victim_count) as max_vc
+			FROM incidents
+			WHERE victim_count > 0 AND province_id IS NOT NULL
+			GROUP BY province_id, district_id, TO_CHAR(incident_date, 'YYYY-MM')
+		) t
+	`).Scan(&totalVictims)
+
 	h.db.QueryRow(ctx, `
 		SELECT COUNT(DISTINCT province_id) FROM incidents WHERE province_id IS NOT NULL
 	`).Scan(&provincesAffected)
@@ -261,14 +273,20 @@ func (h *Handler) GetProvinceStats(c *fiber.Ctx) error {
 	ctx := context.Background()
 
 	rows, err := h.db.Query(ctx, `
-		SELECT p.id, p.name, 
-			   COUNT(i.id) as incident_count,
-			   COALESCE(SUM(i.victim_count), 0) as total_victims,
-			   COALESCE(SUM(i.deaths), 0) as total_deaths
+		SELECT p.id, p.name,
+			   COUNT(DISTINCT i.id) as incident_count,
+			   COALESCE(SUM(max_vc), 0) as total_victims,
+			   0 as total_deaths
 		FROM provinces p
-		LEFT JOIN incidents i ON i.province_id = p.id
+		JOIN (
+			SELECT province_id, district_id,
+				   MAX(victim_count) as max_vc,
+				   MIN(id) as id
+			FROM incidents
+			WHERE victim_count > 0
+			GROUP BY province_id, district_id, TO_CHAR(incident_date, 'YYYY-MM')
+		) i ON i.province_id = p.id
 		GROUP BY p.id, p.name
-		HAVING COUNT(i.id) > 0
 		ORDER BY total_victims DESC
 	`)
 	if err != nil {
