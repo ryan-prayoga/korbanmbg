@@ -50,13 +50,15 @@ func (h *Handler) GetStats(c *fiber.Ctx) error {
 		PeriodEnd   string `json:"period_end"`
 		ReportDate  string `json:"report_date"`
 		Notes       string `json:"notes"`
+		SourceURL   string `json:"source_url"`
 	}
 
 	rows, _ := h.db.Query(ctx, `
 		SELECT source_name, source_org, total_victims,
 			   COALESCE(TO_CHAR(period_end, 'YYYY-MM-DD'), ''),
 			   COALESCE(TO_CHAR(report_date, 'YYYY-MM-DD'), ''),
-			   COALESCE(notes, '')
+			   COALESCE(notes, ''),
+			   COALESCE(source_url, '')
 		FROM official_figures ORDER BY total_victims DESC
 	`)
 	defer rows.Close()
@@ -64,7 +66,7 @@ func (h *Handler) GetStats(c *fiber.Ctx) error {
 	var officials []OfficialFigure
 	for rows.Next() {
 		var o OfficialFigure
-		rows.Scan(&o.Source, &o.Org, &o.Total, &o.PeriodEnd, &o.ReportDate, &o.Notes)
+		rows.Scan(&o.Source, &o.Org, &o.Total, &o.PeriodEnd, &o.ReportDate, &o.Notes, &o.SourceURL)
 		officials = append(officials, o)
 	}
 

@@ -72,10 +72,14 @@
 			<span class="text-[12px] text-[#888]">Jan 2025 — Mei 2026</span>
 		</div>
 		<div class="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-6">
-			<div class="flex items-end gap-1 h-[120px]">
+			<div class="flex items-end gap-1 h-[160px]">
 				{#each timeline || [] as entry}
 					{@const height = maxVictims > 0 ? Math.max(2, (entry.total_victims / maxVictims) * 100) : 2}
 					<div class="flex-1 flex flex-col items-center h-full justify-end group relative">
+						<!-- Value label on top -->
+						<span class="text-[9px] text-[#888] font-[JetBrains_Mono,monospace] mb-1 {entry.total_victims > 0 ? '' : 'invisible'}">
+							{entry.total_victims >= 1000 ? (entry.total_victims / 1000).toFixed(1) + 'K' : entry.total_victims}
+						</span>
 						<div
 							class="w-full bg-[#e74c3c] rounded-t-[3px] hover:bg-[#ff6b5a] transition-colors cursor-pointer"
 							style="height: {height}%"
@@ -135,14 +139,20 @@
 		</div>
 		<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
 			{#each officialFigures as source}
-				<div class="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-5">
+				<a
+					href={source.source_url || '#'}
+					target="_blank"
+					rel="noopener"
+					class="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-5 no-underline text-inherit hover:border-[#e74c3c] transition-colors block"
+				>
 					<div class="flex items-center gap-2 mb-2">
 						<span class="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-[rgba(231,76,60,0.15)] text-[#e74c3c] uppercase tracking-wide">{source.org}</span>
+						<span class="text-[10px] text-[#666]">↗ Lihat sumber</span>
 					</div>
 					<div class="text-[24px] font-bold font-[JetBrains_Mono,monospace]">{fmt(source.total)}</div>
 					<div class="text-[11px] text-[#888] mt-1">Per {source.period_end}</div>
 					<p class="text-[11px] text-[#888] mt-2 leading-relaxed">{source.notes}</p>
-				</div>
+				</a>
 			{/each}
 		</div>
 	</section>
