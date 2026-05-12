@@ -1,0 +1,837 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "3217",
+        "name": "Bandung Barat",
+        "province": "Jawa Barat",
+        "kode_prov": "32"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.4669,
+          -6.8575
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "3273",
+        "name": "Bandung",
+        "province": "Jawa Barat",
+        "kode_prov": "32"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.6191,
+          -6.9175
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "3203",
+        "name": "Cianjur",
+        "province": "Jawa Barat",
+        "kode_prov": "32"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.14,
+          -6.8204
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "3205",
+        "name": "Garut",
+        "province": "Jawa Barat",
+        "kode_prov": "32"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.9089,
+          -7.2275
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "3206",
+        "name": "Tasikmalaya",
+        "province": "Jawa Barat",
+        "kode_prov": "32"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          108.2172,
+          -7.3506
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "3211",
+        "name": "Sumedang",
+        "province": "Jawa Barat",
+        "kode_prov": "32"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.9185,
+          -6.8563
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "3277",
+        "name": "Cimahi",
+        "province": "Jawa Barat",
+        "kode_prov": "32"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          107.5413,
+          -6.8841
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "3202",
+        "name": "Sukabumi",
+        "province": "Jawa Barat",
+        "kode_prov": "32"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.93,
+          -6.9277
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "3201",
+        "name": "Bogor",
+        "province": "Jawa Barat",
+        "kode_prov": "32"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.806,
+          -6.5971
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "3208",
+        "name": "Kuningan",
+        "province": "Jawa Barat",
+        "kode_prov": "32"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          108.4836,
+          -6.9756
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "3207",
+        "name": "Ciamis",
+        "province": "Jawa Barat",
+        "kode_prov": "32"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          108.352,
+          -7.3305
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "3578",
+        "name": "Surabaya",
+        "province": "Jawa Timur",
+        "kode_prov": "35"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          112.7521,
+          -7.2575
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "3516",
+        "name": "Mojokerto",
+        "province": "Jawa Timur",
+        "kode_prov": "35"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          112.4401,
+          -7.4704
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "3571",
+        "name": "Kediri",
+        "province": "Jawa Timur",
+        "kode_prov": "35"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          112.0178,
+          -7.816
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "3504",
+        "name": "Tulungagung",
+        "province": "Jawa Timur",
+        "kode_prov": "35"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          111.9024,
+          -8.0654
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "3522",
+        "name": "Bojonegoro",
+        "province": "Jawa Timur",
+        "kode_prov": "35"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          111.8815,
+          -7.1503
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "3524",
+        "name": "Lamongan",
+        "province": "Jawa Timur",
+        "kode_prov": "35"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          112.4171,
+          -7.1199
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "3310",
+        "name": "Klaten",
+        "province": "Jawa Tengah",
+        "kode_prov": "33"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.6042,
+          -7.7056
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "3321",
+        "name": "Demak",
+        "province": "Jawa Tengah",
+        "kode_prov": "33"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.6381,
+          -6.8936
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "3319",
+        "name": "Kudus",
+        "province": "Jawa Tengah",
+        "kode_prov": "33"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.8405,
+          -6.8048
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "3317",
+        "name": "Rembang",
+        "province": "Jawa Tengah",
+        "kode_prov": "33"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          111.3461,
+          -6.7073
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "3301",
+        "name": "Cilacap",
+        "province": "Jawa Tengah",
+        "kode_prov": "33"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          109.0154,
+          -7.7189
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "3374",
+        "name": "Semarang",
+        "province": "Jawa Tengah",
+        "kode_prov": "33"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.4196,
+          -6.9666
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "3315",
+        "name": "Grobogan",
+        "province": "Jawa Tengah",
+        "kode_prov": "33"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.8672,
+          -7.0247
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "3172",
+        "name": "Jakarta Timur",
+        "province": "DKI Jakarta",
+        "kode_prov": "31"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.9004,
+          -6.225
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "3402",
+        "name": "Bantul",
+        "province": "DI Yogyakarta",
+        "kode_prov": "34"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.3275,
+          -7.8894
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "3403",
+        "name": "Gunungkidul",
+        "province": "DI Yogyakarta",
+        "kode_prov": "34"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          110.6014,
+          -7.9831
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "3672",
+        "name": "Cilegon",
+        "province": "Banten",
+        "kode_prov": "36"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.0507,
+          -6.0023
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "3604",
+        "name": "Serang",
+        "province": "Banten",
+        "kode_prov": "36"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.164,
+          -6.1103
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "6104",
+        "name": "Ketapang",
+        "province": "Kalimantan Barat",
+        "kode_prov": "61"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          109.9781,
+          -1.8293
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "6107",
+        "name": "Landak",
+        "province": "Kalimantan Barat",
+        "kode_prov": "61"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          109.6,
+          0.35
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "5203",
+        "name": "Lombok Timur",
+        "province": "NTB",
+        "kode_prov": "52"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.55,
+          -8.55
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "5202",
+        "name": "Lombok",
+        "province": "NTB",
+        "kode_prov": "52"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          116.1167,
+          -8.5833
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "5204",
+        "name": "Sumbawa",
+        "province": "NTB",
+        "kode_prov": "52"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          117.4167,
+          -8.5
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "5206",
+        "name": "Bima",
+        "province": "NTB",
+        "kode_prov": "52"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          118.7267,
+          -8.4608
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "5315",
+        "name": "Sumba",
+        "province": "NTT",
+        "kode_prov": "53"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          119.5,
+          -9.65
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "5314",
+        "name": "Manggarai Barat",
+        "province": "NTT",
+        "kode_prov": "53"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          120.0,
+          -8.5833
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "5371",
+        "name": "Kupang",
+        "province": "NTT",
+        "kode_prov": "53"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          123.607,
+          -10.1772
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "5302",
+        "name": "TTS",
+        "province": "NTT",
+        "kode_prov": "53"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          124.25,
+          -9.85
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "1207",
+        "name": "Dairi",
+        "province": "Sumatera Utara",
+        "kode_prov": "12"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          98.2167,
+          2.75
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "1207",
+        "name": "Deli Serdang",
+        "province": "Sumatera Utara",
+        "kode_prov": "12"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          98.6833,
+          3.4167
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "1604",
+        "name": "PALI",
+        "province": "Sumatera Selatan",
+        "kode_prov": "16"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          103.75,
+          -3.25
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "1305",
+        "name": "Agam",
+        "province": "Sumatera Barat",
+        "kode_prov": "13"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          100.3333,
+          -0.3333
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "1801",
+        "name": "Lampung",
+        "province": "Lampung",
+        "kode_prov": "18"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          105.2667,
+          -5.45
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "2105",
+        "name": "Kepulauan Anambas",
+        "province": "Kepulauan Riau",
+        "kode_prov": "21"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          106.25,
+          3.2167
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "7405",
+        "name": "Kolaka",
+        "province": "Sulawesi Tenggara",
+        "kode_prov": "74"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          121.5833,
+          -4.0
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "7472",
+        "name": "Baubau",
+        "province": "Sulawesi Tenggara",
+        "kode_prov": "74"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          122.6333,
+          -5.4667
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "7604",
+        "name": "Polewali Mandar",
+        "province": "Sulawesi Barat",
+        "kode_prov": "76"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          119.0,
+          -3.4167
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "7601",
+        "name": "Majene",
+        "province": "Sulawesi Barat",
+        "kode_prov": "76"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          118.9667,
+          -3.5333
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "7500",
+        "name": "Gorontalo",
+        "province": "Gorontalo",
+        "kode_prov": "75"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          123.0667,
+          0.5333
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "7172",
+        "name": "Tomohon",
+        "province": "Sulawesi Utara",
+        "kode_prov": "71"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          124.8333,
+          1.3167
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "kode": "9408",
+        "name": "Nabire",
+        "province": "Papua Tengah",
+        "kode_prov": "94"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          135.5,
+          -3.3667
+        ]
+      }
+    }
+  ]
+}
