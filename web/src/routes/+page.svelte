@@ -80,7 +80,7 @@
 		</div>
 		<div class="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-6">
 			<div class="flex items-end gap-1 h-[160px]">
-				{#each timeline || [] as entry}
+				{#each timeline || [] as entry, i}
 					{@const height = maxVictims > 0 ? Math.max(2, (entry.total_victims / maxVictims) * 100) : 2}
 					<div class="flex-1 flex flex-col items-center h-full justify-end group relative">
 						<!-- Value label on top -->
@@ -97,7 +97,14 @@
 							<div class="text-[#e74c3c]">{fmt(entry.total_victims)} korban</div>
 							<div class="text-[#888]">{entry.incident_count} insiden</div>
 						</div>
-						<span class="text-[10px] text-[#888] mt-2 font-[JetBrains_Mono,monospace] hidden sm:block">
+					</div>
+				{/each}
+			</div>
+			<!-- Month labels below chart -->
+			<div class="flex gap-1 mt-2">
+				{#each timeline || [] as entry, i}
+					<div class="flex-1 text-center">
+						<span class="text-[9px] text-[#888] font-[JetBrains_Mono,monospace]">
 							{fmtMonth(entry.month)}
 						</span>
 					</div>
