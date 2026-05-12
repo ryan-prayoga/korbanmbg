@@ -24,6 +24,7 @@ jobs:
             set -e
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
+            export PATH="/usr/bin:$HOME/.nvm/versions/node/v24.14.0/bin:$PATH"
 
             cd /home/ubuntu/projects/korbanmbg
 
@@ -32,7 +33,7 @@ jobs:
 
             # Build API (Go)
             cd api
-            /usr/local/go/bin/go build -o korbanmbg-api .
+            go build -o korbanmbg-api .
             cd ..
 
             # Build Frontend (SvelteKit)
