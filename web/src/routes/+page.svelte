@@ -6,8 +6,11 @@
 		return n.toLocaleString('id-ID');
 	}
 
-	// Use deduplicated sum from DB
-	const totalVictims = stats.total_victims;
+	// Use official figure as headline (highest authoritative source)
+	const officialFigures = stats.official_figures || [];
+	const headlineFigure = officialFigures[0]; // Highest (UGM: 33,626)
+	const totalVictims = headlineFigure ? headlineFigure.total : stats.total_victims;
+	const headlineSource = headlineFigure?.org || 'Data agregasi';
 	const maxVictims = Math.max(...(timeline || []).map((t: any) => t.total_victims), 1);
 </script>
 
@@ -20,21 +23,24 @@
 	<!-- Hero stat -->
 	<section class="mb-12">
 		<div class="text-[13px] text-[#888] mb-2 flex items-center gap-2">
-			<span class="text-[10px] bg-[rgba(231,76,60,0.15)] text-[#e74c3c] px-1.5 py-0.5 rounded font-semibold uppercase tracking-wide">Live</span>
-			Data diperbarui otomatis setiap hari
+			<span class="text-[10px] bg-[rgba(231,76,60,0.15)] text-[#e74c3c] px-1.5 py-0.5 rounded font-semibold uppercase tracking-wide">Data Resmi</span>
+			Sumber: {headlineSource} ({headlineFigure?.period_end || ''})
 		</div>
 		<div class="text-[clamp(56px,12vw,96px)] font-extrabold leading-none tracking-tight font-[JetBrains_Mono,monospace]">
 			{fmt(totalVictims)}
 		</div>
 		<p class="text-[15px] text-[#888] mt-3 max-w-[500px]">
-			anak keracunan akibat program Makan Bergizi Gratis sejak Januari 2025
+			pelajar keracunan akibat program Makan Bergizi Gratis sejak Januari 2025
 		</p>
 		<div class="flex flex-wrap gap-2 mt-3">
 			<span class="inline-block text-[11px] font-[JetBrains_Mono,monospace] text-[#888] bg-[#1a1a1a] px-2 py-1 rounded border border-[#2a2a2a]">
-				{stats.total_incidents} artikel terdokumentasi
+				{stats.unique_incidents} insiden terverifikasi
 			</span>
 			<span class="inline-block text-[11px] font-[JetBrains_Mono,monospace] text-[#888] bg-[#1a1a1a] px-2 py-1 rounded border border-[#2a2a2a]">
 				{stats.provinces_affected} provinsi terdampak
+			</span>
+			<span class="inline-block text-[11px] font-[JetBrains_Mono,monospace] text-[#888] bg-[#1a1a1a] px-2 py-1 rounded border border-[#2a2a2a]">
+				{fmt(stats.total_articles)} artikel berita
 			</span>
 		</div>
 	</section>
@@ -43,19 +49,19 @@
 	<section class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-12">
 		<div class="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-5">
 			<div class="text-[28px] font-bold font-[JetBrains_Mono,monospace] text-[#e74c3c]">{fmt(totalVictims)}</div>
-			<div class="text-[12px] text-[#888] mt-1">Total korban</div>
+			<div class="text-[12px] text-[#888] mt-1">Total korban (resmi)</div>
 		</div>
 		<div class="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-5">
-			<div class="text-[28px] font-bold font-[JetBrains_Mono,monospace]">{stats.total_incidents}</div>
-			<div class="text-[12px] text-[#888] mt-1">Artikel berita</div>
+			<div class="text-[28px] font-bold font-[JetBrains_Mono,monospace]">{stats.unique_incidents}</div>
+			<div class="text-[12px] text-[#888] mt-1">Insiden unik</div>
 		</div>
 		<div class="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-5">
 			<div class="text-[28px] font-bold font-[JetBrains_Mono,monospace]">{stats.provinces_affected}</div>
 			<div class="text-[12px] text-[#888] mt-1">Provinsi terdampak</div>
 		</div>
 		<div class="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-5">
-			<div class="text-[28px] font-bold font-[JetBrains_Mono,monospace]">{stats.unique_incidents}</div>
-			<div class="text-[12px] text-[#888] mt-1">Insiden unik</div>
+			<div class="text-[28px] font-bold font-[JetBrains_Mono,monospace]">{fmt(stats.total_articles)}</div>
+			<div class="text-[12px] text-[#888] mt-1">Artikel berita</div>
 		</div>
 	</section>
 
@@ -63,7 +69,7 @@
 	<section class="mb-12">
 		<div class="flex justify-between items-baseline mb-4">
 			<h2 class="text-[16px] font-semibold">Korban per Bulan</h2>
-			<span class="text-[12px] text-[#888]">Feb 2025 — Mei 2026</span>
+			<span class="text-[12px] text-[#888]">Jan 2025 — Mei 2026</span>
 		</div>
 		<div class="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-6">
 			<div class="flex items-end gap-1 h-[120px]">
@@ -121,22 +127,35 @@
 		</div>
 	</section>
 
-	<!-- Aggregate sources -->
-	<section>
+	<!-- Official figures from authoritative sources -->
+	<section class="mb-12">
 		<div class="flex justify-between items-baseline mb-4">
 			<h2 class="text-[16px] font-semibold">Sumber Data Resmi</h2>
+			<a href="/tentang" class="text-[12px] text-[#888] hover:text-[#e74c3c] transition-colors no-underline">Metodologi →</a>
 		</div>
 		<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-			{#each stats.aggregate_data || [] as source}
+			{#each officialFigures as source}
 				<div class="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-5">
 					<div class="flex items-center gap-2 mb-2">
 						<span class="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-[rgba(231,76,60,0.15)] text-[#e74c3c] uppercase tracking-wide">{source.org}</span>
 					</div>
 					<div class="text-[24px] font-bold font-[JetBrains_Mono,monospace]">{fmt(source.total)}</div>
-					<div class="text-[11px] text-[#888] mt-1">{source.period_start} — {source.period_end}</div>
+					<div class="text-[11px] text-[#888] mt-1">Per {source.period_end}</div>
 					<p class="text-[11px] text-[#888] mt-2 leading-relaxed">{source.notes}</p>
 				</div>
 			{/each}
 		</div>
+	</section>
+
+	<!-- Methodology note -->
+	<section class="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-6">
+		<h3 class="text-[14px] font-semibold mb-2">Catatan Metodologi</h3>
+		<p class="text-[12px] text-[#888] leading-relaxed">
+			Angka headline menggunakan data resmi dari sumber otoritatif (UGM, KPAI, BGN, JPPI). 
+			Data insiden dikumpulkan dari {fmt(stats.total_articles)} artikel berita yang dikelompokkan menjadi 
+			{stats.unique_incidents} insiden unik berdasarkan lokasi dan tanggal kejadian. 
+			Satu insiden bisa diliput oleh banyak media — kami deduplikasi untuk menghindari penghitungan ganda.
+			<a href="/tentang" class="text-[#e74c3c] hover:underline no-underline ml-1">Baca selengkapnya →</a>
+		</p>
 	</section>
 </main>

@@ -20,79 +20,63 @@ func New(db *pgxpool.Pool) *Handler {
 func (h *Handler) GetStats(c *fiber.Ctx) error {
 	ctx := context.Background()
 
-	var totalIncidents, totalVictims, totalDeaths, totalHospitalized int
-	var provincesAffected, uniqueIncidents int
+	var totalArticles, totalVictims, totalDeaths, totalHospitalized int
+	var provincesAffected, uniqueIncidentCount int
 	var lastUpdated string
 
+	// Count from unique_incidents (properly deduplicated)
 	h.db.QueryRow(ctx, `
-		SELECT 
-			COUNT(*), 
-			COALESCE(SUM(victim_count), 0),
-			COALESCE(SUM(deaths), 0),
-			COALESCE(SUM(hospitalized), 0)
-		FROM incidents
-	`).Scan(&totalIncidents, &totalVictims, &totalDeaths, &totalHospitalized)
+		SELECT COUNT(*), COALESCE(SUM(victim_count), 0),
+			   COALESCE(SUM(deaths), 0), COALESCE(SUM(hospitalized), 0)
+		FROM unique_incidents
+	`).Scan(&uniqueIncidentCount, &totalVictims, &totalDeaths, &totalHospitalized)
 
-	// Use deduplicated total: MAX victim_count per (province, district, month) cluster
-	h.db.QueryRow(ctx, `
-		SELECT COALESCE(SUM(max_vc), 0) FROM (
-			SELECT province_id, district_id,
-				   TO_CHAR(incident_date, 'YYYY-MM') as month,
-				   MAX(victim_count) as max_vc
-			FROM incidents
-			WHERE victim_count > 0 AND province_id IS NOT NULL
-			GROUP BY province_id, district_id, TO_CHAR(incident_date, 'YYYY-MM')
-		) t
-	`).Scan(&totalVictims)
+	h.db.QueryRow(ctx, `SELECT COUNT(*) FROM incidents`).Scan(&totalArticles)
 
 	h.db.QueryRow(ctx, `
-		SELECT COUNT(DISTINCT province_id) FROM incidents WHERE province_id IS NOT NULL
+		SELECT COUNT(DISTINCT province_id) FROM unique_incidents WHERE province_id IS NOT NULL
 	`).Scan(&provincesAffected)
-
-	h.db.QueryRow(ctx, `
-		SELECT COUNT(*) FROM incidents WHERE victim_count > 0
-	`).Scan(&uniqueIncidents)
 
 	h.db.QueryRow(ctx, `
 		SELECT COALESCE(TO_CHAR(MAX(created_at), 'YYYY-MM-DD HH24:MI'), '')
 		FROM incidents
 	`).Scan(&lastUpdated)
 
-	// Get aggregate data (KPAI, JPPI, etc.)
-	type AggData struct {
+	// Get official figures from authoritative sources
+	type OfficialFigure struct {
 		Source      string `json:"source"`
 		Org         string `json:"org"`
 		Total       int    `json:"total"`
-		PeriodStart string `json:"period_start"`
 		PeriodEnd   string `json:"period_end"`
+		ReportDate  string `json:"report_date"`
 		Notes       string `json:"notes"`
 	}
 
 	rows, _ := h.db.Query(ctx, `
-		SELECT source_name, COALESCE(source_org, ''), total_victims, 
-			   COALESCE(TO_CHAR(period_start, 'YYYY-MM-DD'), ''),
+		SELECT source_name, source_org, total_victims,
 			   COALESCE(TO_CHAR(period_end, 'YYYY-MM-DD'), ''),
+			   COALESCE(TO_CHAR(report_date, 'YYYY-MM-DD'), ''),
 			   COALESCE(notes, '')
-		FROM aggregate_data ORDER BY total_victims DESC
+		FROM official_figures ORDER BY total_victims DESC
 	`)
 	defer rows.Close()
 
-	var aggregates []AggData
+	var officials []OfficialFigure
 	for rows.Next() {
-		var a AggData
-		rows.Scan(&a.Source, &a.Org, &a.Total, &a.PeriodStart, &a.PeriodEnd, &a.Notes)
-		aggregates = append(aggregates, a)
+		var o OfficialFigure
+		rows.Scan(&o.Source, &o.Org, &o.Total, &o.PeriodEnd, &o.ReportDate, &o.Notes)
+		officials = append(officials, o)
 	}
 
 	return c.JSON(fiber.Map{
-		"total_incidents":    totalIncidents,
-		"total_victims":     totalVictims,
-		"total_deaths":      totalDeaths,
+		"total_articles":     totalArticles,
+		"total_victims":      totalVictims,
+		"total_deaths":       totalDeaths,
 		"total_hospitalized": totalHospitalized,
 		"provinces_affected": provincesAffected,
-		"unique_incidents":   uniqueIncidents,
-		"last_updated":      lastUpdated,
-		"aggregate_data":    aggregates,
+		"unique_incidents":   uniqueIncidentCount,
+		"last_updated":       lastUpdated,
+		"official_figures":   officials,
 	})
 }
 
@@ -268,25 +252,19 @@ func (h *Handler) GetIncidentByID(c *fiber.Ctx) error {
 	return c.JSON(inc)
 }
 
-// GetProvinceStats returns victim stats per province
+// GetProvinceStats returns victim stats per province (from deduplicated unique_incidents)
 func (h *Handler) GetProvinceStats(c *fiber.Ctx) error {
 	ctx := context.Background()
 
 	rows, err := h.db.Query(ctx, `
 		SELECT p.id, p.name,
-			   COUNT(DISTINCT i.id) as incident_count,
-			   COALESCE(SUM(max_vc), 0) as total_victims,
-			   0 as total_deaths
+			   COUNT(ui.id) as incident_count,
+			   COALESCE(SUM(ui.victim_count), 0) as total_victims,
+			   COALESCE(SUM(ui.deaths), 0) as total_deaths
 		FROM provinces p
-		JOIN (
-			SELECT province_id, district_id,
-				   MAX(victim_count) as max_vc,
-				   MIN(id) as id
-			FROM incidents
-			WHERE victim_count > 0
-			GROUP BY province_id, district_id, TO_CHAR(incident_date, 'YYYY-MM')
-		) i ON i.province_id = p.id
+		JOIN unique_incidents ui ON ui.province_id = p.id
 		GROUP BY p.id, p.name
+		HAVING SUM(ui.victim_count) > 0
 		ORDER BY total_victims DESC
 	`)
 	if err != nil {
@@ -312,7 +290,7 @@ func (h *Handler) GetProvinceStats(c *fiber.Ctx) error {
 	return c.JSON(stats)
 }
 
-// GetTimeline returns incidents grouped by month
+// GetTimeline returns incidents grouped by month (from deduplicated unique_incidents)
 func (h *Handler) GetTimeline(c *fiber.Ctx) error {
 	ctx := context.Background()
 
@@ -320,7 +298,7 @@ func (h *Handler) GetTimeline(c *fiber.Ctx) error {
 		SELECT TO_CHAR(incident_date, 'YYYY-MM') as month,
 			   COUNT(*) as incident_count,
 			   COALESCE(SUM(victim_count), 0) as total_victims
-		FROM incidents
+		FROM unique_incidents
 		WHERE incident_date IS NOT NULL
 		GROUP BY month
 		ORDER BY month ASC
