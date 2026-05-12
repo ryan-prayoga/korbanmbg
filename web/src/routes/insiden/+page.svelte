@@ -15,6 +15,7 @@
 		if (page > 1) params.set('page', String(page));
 		if (data.selectedProvince) params.set('province', data.selectedProvince);
 		if (data.query) params.set('q', data.query);
+		if (data.sort && data.sort !== 'incident_date') params.set('sort', data.sort);
 		const qs = params.toString();
 		return '/insiden' + (qs ? '?' + qs : '');
 	}
@@ -42,19 +43,23 @@
 		</div>
 
 		<div class="flex flex-wrap gap-2 items-center">
-			<form method="get" class="flex gap-2">
+			<form method="get" class="flex flex-wrap gap-2">
 				<input
 					type="text"
 					name="q"
 					value={data.query}
 					placeholder="Cari..."
-					class="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg px-3 py-2 text-[13px] text-[#e8e8e8] placeholder-[#555] outline-none focus:border-[#e74c3c] transition-colors w-[120px]"
+					class="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg px-3 py-2 text-[13px] text-[#e8e8e8] placeholder-[#555] outline-none focus:border-[#e74c3c] transition-colors w-[110px]"
 				/>
 				<select name="province" class="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg px-3 py-2 text-[13px] text-[#e8e8e8] outline-none focus:border-[#e74c3c] transition-colors">
 					<option value="">Semua Provinsi</option>
 					{#each data.provinces as prov}
 						<option value={prov.id} selected={String(prov.id) === data.selectedProvince}>{prov.name}</option>
 					{/each}
+				</select>
+				<select name="sort" class="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg px-3 py-2 text-[13px] text-[#e8e8e8] outline-none focus:border-[#e74c3c] transition-colors">
+					<option value="incident_date" selected={data.sort === 'incident_date'}>Terbaru</option>
+					<option value="victim_count" selected={data.sort === 'victim_count'}>Korban terbanyak</option>
 				</select>
 				<button type="submit" class="bg-[#e74c3c] hover:bg-[#c0392b] px-4 py-2 rounded-lg text-[13px] font-medium transition-colors">
 					Filter
@@ -71,7 +76,7 @@
 	<!-- Incident feed -->
 	<div class="space-y-0">
 		{#each data.incidents.data || [] as incident}
-			<a href="/insiden/{incident.id}" class="flex justify-between items-start gap-4 py-4 border-b border-[#2a2a2a] no-underline text-[#e8e8e8] hover:bg-[#1a1a1a] -mx-3 px-3 rounded transition-colors">
+			<a href="/insiden/{incident.id}" class="flex justify-between items-start gap-3 py-4 border-b border-[#2a2a2a] no-underline text-[#e8e8e8] hover:bg-[#1a1a1a] -mx-3 px-3 rounded transition-colors">
 				<div class="flex-1 min-w-0">
 					<div class="text-[14px] font-medium leading-snug">{incident.title}</div>
 					<div class="flex flex-wrap gap-1.5 mt-2">
@@ -91,12 +96,15 @@
 						</span>
 					{/if}
 				</div>
-				{#if incident.victim_count > 0}
-					<div class="shrink-0 text-right">
-						<span class="text-[18px] font-semibold font-[JetBrains_Mono,monospace] text-[#e74c3c]">{fmt(incident.victim_count)}</span>
+				<!-- Victim count — always visible including mobile -->
+				<div class="shrink-0 text-right min-w-[56px]">
+					{#if incident.victim_count > 0}
+						<div class="text-[18px] font-bold font-[JetBrains_Mono,monospace] text-[#e74c3c] leading-tight">{fmt(incident.victim_count)}</div>
 						<div class="text-[10px] text-[#888]">korban</div>
-					</div>
-				{/if}
+					{:else}
+						<div class="text-[11px] text-[#555]">—</div>
+					{/if}
+				</div>
 			</a>
 		{/each}
 

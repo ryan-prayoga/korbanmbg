@@ -4,11 +4,12 @@ export async function load({ fetch, url }) {
 	const page = url.searchParams.get('page') || '1';
 	const province_id = url.searchParams.get('province') || '';
 	const q = url.searchParams.get('q') || '';
+	const sort = url.searchParams.get('sort') || 'incident_date';
 
 	const params = new URLSearchParams({
 		page,
 		limit: '20',
-		sort: 'incident_date',
+		sort,
 		order: 'DESC',
 	});
 	if (province_id) params.set('province_id', province_id);
@@ -25,5 +26,6 @@ export async function load({ fetch, url }) {
 		currentPage: parseInt(page),
 		selectedProvince: province_id,
 		query: q,
+		sort,
 	};
 }
