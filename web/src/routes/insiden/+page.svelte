@@ -19,6 +19,15 @@
 		const qs = params.toString();
 		return '/insiden' + (qs ? '?' + qs : '');
 	}
+
+	function getDomain(url: string): string {
+		try {
+			const u = new URL(url);
+			return u.hostname.replace('www.', '');
+		} catch {
+			return '';
+		}
+	}
 </script>
 
 <svelte:head>
@@ -76,9 +85,9 @@
 	<!-- Incident feed -->
 	<div class="space-y-0">
 		{#each data.incidents.data || [] as incident}
-			<a href="/insiden/{incident.id}" class="flex justify-between items-start gap-3 py-4 border-b border-[#2a2a2a] no-underline text-[#e8e8e8] hover:bg-[#1a1a1a] -mx-3 px-3 rounded transition-colors">
+			<div class="flex justify-between items-start gap-3 py-4 border-b border-[#2a2a2a] -mx-3 px-3 rounded hover:bg-[#1a1a1a] transition-colors">
 				<div class="flex-1 min-w-0">
-					<div class="text-[14px] font-medium leading-snug">{incident.title}</div>
+					<div class="text-[14px] font-medium leading-snug text-[#e8e8e8]">{incident.title}</div>
 					<div class="flex flex-wrap gap-1.5 mt-2">
 						{#if incident.province}
 							<span class="text-[11px] px-2 py-0.5 rounded bg-[#242424] text-[#888] border border-[#2a2a2a]">{incident.province}</span>
@@ -91,9 +100,16 @@
 						{/if}
 					</div>
 					{#if incident.source_url}
-						<span class="text-[11px] text-[#888] mt-2 inline-block">
-							↗ {incident.source_name || 'Sumber'}
-						</span>
+						<a
+							href={incident.source_url}
+							target="_blank"
+							rel="noopener noreferrer"
+							class="text-[11px] text-[#e74c3c] hover:text-[#ff6b5b] mt-2 inline-flex items-center gap-1 no-underline hover:underline"
+							onclick={(e) => e.stopPropagation()}
+						>
+							<svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+							{incident.source_name || getDomain(incident.source_url)}
+						</a>
 					{/if}
 				</div>
 				<!-- Victim count — always visible including mobile -->
@@ -105,7 +121,7 @@
 						<div class="text-[11px] text-[#555]">—</div>
 					{/if}
 				</div>
-			</a>
+			</div>
 		{/each}
 
 		{#if (data.incidents.data || []).length === 0}

@@ -5,19 +5,19 @@
 	let mapContainer: HTMLDivElement;
 	let selectedProv = $state<{ code: string; name: string; victims: number; incidents: number } | null>(null);
 
-	const API_BASE = 'http://127.0.0.1:8090';
-
 	function fmt(n: number): string {
 		return n.toLocaleString('id-ID');
 	}
 
-	// Color scale: white → dark red based on intensity
+	// Color scale: dark → red based on intensity
 	function getColor(intensity: number): string {
 		if (intensity === 0) return '#1a1a1a';
+		if (intensity < 0.05) return '#3d0c0c';
 		if (intensity < 0.1) return '#4a1010';
-		if (intensity < 0.25) return '#7a1515';
+		if (intensity < 0.2) return '#6a1313';
+		if (intensity < 0.35) return '#8a1818';
 		if (intensity < 0.5) return '#a82020';
-		if (intensity < 0.75) return '#cc2a2a';
+		if (intensity < 0.7) return '#cc2a2a';
 		return '#e74c3c';
 	}
 
@@ -26,13 +26,12 @@
 
 		const map = L.map(mapContainer, {
 			zoomControl: false,
-			attributionControl: true,
+			attributionControl: false,
 		}).setView([-2.5, 118], 5);
 
 		L.control.zoom({ position: 'bottomright' }).addTo(map);
 
 		L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {
-			attribution: '&copy; OSM &copy; CARTO',
 			maxZoom: 18,
 		}).addTo(map);
 
@@ -61,7 +60,6 @@
 						provLayer.resetStyle(e.target);
 					},
 					click: async (e: any) => {
-						// Update selected province info
 						selectedProv = {
 							code: p.prov_code,
 							name: p.prov_name,
@@ -69,13 +67,9 @@
 							incidents: p.incidents,
 						};
 
-						// Remove existing kab layer
 						if (kabLayer) map.removeLayer(kabLayer);
-
-						// Zoom to province
 						map.fitBounds(e.target.getBounds(), { padding: [20, 20] });
 
-						// Load kabupaten layer
 						try {
 							const kabRes = await fetch(`/api/geodata/kabupaten/${p.prov_code}.geojson`);
 							if (!kabRes.ok) return;
@@ -152,6 +146,7 @@
 		.kab-tooltip { background: #1a1a1a; border: 1px solid #333; color: #e8e8e8; font-size: 11px; }
 		.leaflet-tooltip { background: #1a1a1a; border: 1px solid #333; color: #e8e8e8; font-size: 11px; box-shadow: none; }
 		.leaflet-tooltip::before { border-top-color: #333; }
+		.leaflet-control-attribution { display: none !important; }
 	</style>
 </svelte:head>
 
@@ -210,6 +205,7 @@
 	<!-- Province table -->
 	<div class="flex justify-between items-baseline mb-4">
 		<h2 class="text-[16px] font-semibold">Statistik per Provinsi</h2>
+		<span class="text-[12px] text-[#888]">{data.provinces.length} provinsi terdampak</span>
 	</div>
 	<div class="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg overflow-hidden">
 		<div class="overflow-x-auto">
