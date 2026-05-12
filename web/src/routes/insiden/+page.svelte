@@ -60,7 +60,7 @@
 						<span class="text-[18px] font-semibold font-[JetBrains_Mono,monospace] text-[#e74c3c]">{fmt(incident.victim_count)}</span>
 					</div>
 				{/if}
-			</div>
+			</a>
 		{/each}
 	</div>
 
