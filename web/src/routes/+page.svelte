@@ -82,7 +82,8 @@
 			<div class="flex items-end gap-1 h-[160px]">
 				{#each timeline || [] as entry, i}
 					{@const height = maxVictims > 0 ? Math.max(2, (entry.total_victims / maxVictims) * 100) : 2}
-					<div class="flex-1 flex flex-col items-center h-full justify-end group relative">
+					{@const isNewYear = i > 0 && entry.month.slice(0,4) !== (timeline[i-1]?.month || '').slice(0,4)}
+					<div class="flex-1 flex flex-col items-center h-full justify-end group relative {isNewYear ? 'border-l border-[#444] ml-1 pl-1' : ''}">
 						<!-- Value label on top -->
 						<span class="text-[9px] text-[#888] font-[JetBrains_Mono,monospace] mb-1 {entry.total_victims > 0 ? '' : 'invisible'}">
 							{entry.total_victims >= 1000 ? (entry.total_victims / 1000).toFixed(1) + 'K' : entry.total_victims}
@@ -100,13 +101,28 @@
 					</div>
 				{/each}
 			</div>
-			<!-- Month labels below chart -->
-			<div class="flex gap-1 mt-2">
+			<!-- Month labels row -->
+			<div class="flex gap-1 mt-2 border-t border-[#2a2a2a] pt-2">
 				{#each timeline || [] as entry, i}
-					<div class="flex-1 text-center">
-						<span class="text-[9px] text-[#888] font-[JetBrains_Mono,monospace]">
-							{fmtMonth(entry.month)}
+					{@const isNewYear = i > 0 && entry.month.slice(0,4) !== (timeline[i-1]?.month || '').slice(0,4)}
+					<div class="flex-1 text-center {isNewYear ? 'border-l border-[#444] ml-1 pl-1' : ''}">
+						<span class="text-[9px] text-[#ccc] font-[JetBrains_Mono,monospace] block">
+							{monthNames[parseInt(entry.month.slice(5)) - 1]}
 						</span>
+					</div>
+				{/each}
+			</div>
+			<!-- Year labels row -->
+			<div class="flex gap-1 mt-1">
+				{#each timeline || [] as entry, i}
+					{@const year = entry.month.slice(0,4)}
+					{@const isFirstOfYear = i === 0 || year !== (timeline[i-1]?.month || '').slice(0,4)}
+					<div class="flex-1 text-center">
+						{#if isFirstOfYear}
+							<span class="text-[10px] text-[#e74c3c] font-semibold font-[JetBrains_Mono,monospace]">
+								{year}
+							</span>
+						{/if}
 					</div>
 				{/each}
 			</div>
