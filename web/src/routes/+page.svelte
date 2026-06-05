@@ -1,6 +1,10 @@
 <script lang="ts">
 	let { data } = $props();
-	const { stats, timeline, provinces } = data;
+	const { stats, timeline, provinces, apiError } = data;
+
+	// Apakah data inti benar-benar kosong (API down / belum ada data).
+	// Dipakai untuk mencegah headline tampil sebagai fakta "0".
+	const hasData = !apiError && (stats?.total_victims > 0 || (stats?.official_figures || []).length > 0);
 
 	function fmt(n: number): string {
 		return n.toLocaleString('id-ID');
@@ -18,7 +22,25 @@
 	let _start = 0, _end = rawTimeline.length;
 	while (_start < _end && isNoise(rawTimeline[_start])) _start++;
 	while (_end > _start && isNoise(rawTimeline[_end - 1])) _end--;
-	const displayTimeline = rawTimeline.slice(_start, _end);
+	const trimmed = rawTimeline.slice(_start, _end);
+
+	// API hanya mengembalikan bulan yang punya insiden, sehingga bulan kosong
+	// (mis. Jun 2025) hilang dan bar terlihat kontinu padahal ada celah. Isi
+	// bulan yang hilang dengan nilai nol agar sumbu waktu tidak menyesatkan.
+	function fillGaps(entries: any[]): any[] {
+		if (entries.length === 0) return entries;
+		const out: any[] = [];
+		const [sy, sm] = entries[0].month.split('-').map(Number);
+		const [ey, em] = entries[entries.length - 1].month.split('-').map(Number);
+		const byMonth = new Map(entries.map((e) => [e.month, e]));
+		for (let y = sy, m = sm; y < ey || (y === ey && m <= em); ) {
+			const key = `${y}-${String(m).padStart(2, '0')}`;
+			out.push(byMonth.get(key) || { month: key, total_victims: 0, incident_count: 0 });
+			if (++m > 12) { m = 1; y++; }
+		}
+		return out;
+	}
+	const displayTimeline = fillGaps(trimmed);
 	const maxVictims = Math.max(...displayTimeline.map((t: any) => t.total_victims), 1);
 
 	const monthNames = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
@@ -51,6 +73,21 @@
 </svelte:head>
 
 <main class="max-w-[960px] mx-auto px-5 py-10">
+	{#if !hasData}
+		<div class="bg-[rgba(231,76,60,0.08)] border border-[#e74c3c]/40 rounded-lg px-5 py-4 mb-8">
+			<div class="flex items-start gap-3">
+				<span class="w-2 h-2 bg-[#e74c3c] rounded-full mt-1.5 shrink-0 animate-pulse"></span>
+				<div>
+					<p class="text-[14px] font-semibold text-[#e8e8e8]">Data sementara tidak tersedia</p>
+					<p class="text-[13px] text-[#9a9a9a] mt-1 leading-relaxed">
+						Server data sedang tidak dapat dijangkau. Angka di bawah mungkin belum termuat —
+						silakan muat ulang halaman dalam beberapa saat.
+					</p>
+				</div>
+			</div>
+		</div>
+	{/if}
+
 	<!-- Hero stat -->
 	<section class="mb-12">
 		<div class="text-[13px] text-[#888] mb-2 flex items-center gap-2 flex-wrap">
@@ -58,17 +95,18 @@
 			Sumber: {headlineSource} ({headlineFigure?.period_end || ''})
 		</div>
 		<div class="text-[clamp(56px,12vw,96px)] font-extrabold leading-none tracking-tight font-[JetBrains_Mono,monospace]">
-			{fmt(totalVictims)}
+			{hasData ? fmt(totalVictims) : '—'}
 		</div>
 		<p class="text-[15px] text-[#888] mt-3 max-w-[520px]">
 			pelajar diduga keracunan akibat program Makan Bergizi Gratis sejak Januari 2025
 		</p>
-		<p class="text-[12px] text-[#666] mt-3 max-w-[560px] leading-relaxed">
-			Angka headline adalah angka resmi tertinggi dari sumber otoritatif (JPPI).
-			Agregasi independen dari {fmt(stats.total_articles)} artikel berita menghasilkan
-			<span class="text-[#888] font-medium">{fmt(stats.total_victims)}</span> korban —
-			lebih tinggi karena mencakup insiden lokal yang belum terangkum dalam laporan resmi.
-			Sebagian besar kasus berstatus <span class="text-[#888]">diduga</span> dan belum tentu
+		<p class="text-[12px] text-[#9a9a9a] mt-3 max-w-[560px] leading-relaxed">
+			Angka headline adalah <span class="text-[#cccccc]">angka resmi tertinggi</span> dari sumber
+			otoritatif (JPPI). Sebagai pembanding, <span class="text-[#cccccc]">estimasi independen kami</span>
+			dari {fmt(stats.total_articles)} artikel berita mencapai
+			<span class="text-[#cccccc] font-medium">{fmt(stats.total_victims)}</span> korban — lebih tinggi
+			karena turut mencakup insiden lokal yang belum terangkum dalam laporan resmi.
+			Sebagian besar kasus berstatus <span class="text-[#cccccc]">diduga</span> dan belum tentu
 			terkonfirmasi medis. <a href="/tentang" class="text-[#e74c3c] no-underline hover:underline">Metodologi →</a>
 		</p>
 	</section>
@@ -106,7 +144,7 @@
 					{@const isNewYear = i > 0 && entry.month.slice(0,4) !== (displayTimeline[i-1]?.month || '').slice(0,4)}
 					<div class="flex-1 flex flex-col items-center h-full justify-end group relative {isNewYear ? 'border-l border-[#444] ml-1 pl-1' : ''}">
 						<!-- Value label on top -->
-						<span class="text-[9px] text-[#888] font-[JetBrains_Mono,monospace] mb-1 {entry.total_victims > 0 ? '' : 'invisible'}">
+						<span class="text-[9px] text-[#888] font-[JetBrains_Mono,monospace] mb-1 hidden sm:block {entry.total_victims > 0 ? '' : 'sm:invisible'}">
 							{entry.total_victims >= 1000 ? (entry.total_victims / 1000).toFixed(1) + 'K' : entry.total_victims}
 						</span>
 						<div
@@ -198,7 +236,7 @@
 				>
 					<div class="flex items-center gap-2 mb-2">
 						<span class="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-[rgba(231,76,60,0.15)] text-[#e74c3c] uppercase tracking-wide">{source.org}</span>
-						<span class="text-[10px] text-[#666]">↗ Lihat sumber</span>
+						<span class="text-[10px] text-[#888]">↗ Lihat sumber</span>
 					</div>
 					<div class="text-[24px] font-bold font-[JetBrains_Mono,monospace]">{fmt(source.total)}</div>
 					<div class="text-[11px] text-[#888] mt-1">Per {fmtDate(source.period_end)}</div>
@@ -219,7 +257,7 @@
 			<a href="/tentang" class="text-[#e74c3c] hover:underline no-underline ml-1">Baca selengkapnya →</a>
 		</p>
 		{#if stats.last_updated}
-			<p class="text-[11px] text-[#666] mt-3 font-[JetBrains_Mono,monospace]">
+			<p class="text-[11px] text-[#888] mt-3 font-[JetBrains_Mono,monospace]">
 				Artikel terbaru: {fmtLastUpdated(stats.last_updated)}
 			</p>
 		{/if}

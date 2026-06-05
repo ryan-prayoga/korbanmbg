@@ -18,7 +18,7 @@
 		{/if}
 	</p>
 	{#if $page.error?.message}
-		<p class="text-[12px] text-[#555] mt-2 font-[JetBrains_Mono,monospace]">{$page.error.message}</p>
+		<p class="text-[12px] text-[#888] mt-2 font-[JetBrains_Mono,monospace]">{$page.error.message}</p>
 	{/if}
 	<a href="/" class="text-[13px] text-[#e74c3c] mt-6 inline-block no-underline hover:underline">
 		← Kembali ke dashboard

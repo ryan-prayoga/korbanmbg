@@ -116,7 +116,7 @@
 	</section>
 
 	<!-- Last updated -->
-	<div class="text-[12px] text-[#666] border-t border-[#2a2a2a] pt-4">
+	<div class="text-[12px] text-[#888] border-t border-[#2a2a2a] pt-4">
 		Diperbarui otomatis setiap hari · Data bersifat terbuka dan dapat diverifikasi
 	</div>
 </main>
