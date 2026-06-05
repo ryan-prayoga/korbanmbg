@@ -3,13 +3,14 @@
 Fix unassigned provinces in incidents table.
 Matches keywords in title to assign province_id and district_id.
 """
+import os
 import psycopg2
 
 DB_CONFIG = {
     'host': 'localhost',
     'port': 5432,
     'user': 'postgres',
-    'password': '***REDACTED***',
+    'password': os.environ.get('DB_PASS', ''),
     'dbname': 'korbanmbg',
 }
 

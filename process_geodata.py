@@ -11,7 +11,7 @@ import psycopg2
 
 DB_CONFIG = {
     'host': 'localhost', 'port': 5432,
-    'user': 'postgres', 'password': '***REDACTED***',
+    'user': 'postgres', 'password': os.environ.get('DB_PASS', ''),
     'dbname': 'korbanmbg',
 }
 
@@ -59,44 +59,46 @@ def main():
     cur = conn.cursor()
 
     # Get province stats (deduplicated)
+    # Get province stats from unique_incidents (consistent with district stats)
     cur.execute("""
         SELECT p.name,
-               COALESCE(SUM(max_vc), 0) as total_victims,
-               COUNT(*) as incident_count
+               COALESCE(SUM(ui.victim_count), 0) as total_victims,
+               COUNT(ui.id) as incident_count
         FROM provinces p
-        JOIN (
-            SELECT province_id,
-                   MAX(victim_count) as max_vc
-            FROM incidents
-            WHERE victim_count > 0
-            GROUP BY province_id, district_id, TO_CHAR(incident_date, 'YYYY-MM')
-        ) i ON i.province_id = p.id
+        LEFT JOIN unique_incidents ui ON ui.province_id = p.id
         GROUP BY p.name
     """)
     prov_stats = {row[0]: {'victims': row[1], 'incidents': row[2]} for row in cur.fetchall()}
 
-    # Get district stats (deduplicated)
+    # Get district stats from unique_incidents (consistent with DB view)
     cur.execute("""
-        SELECT p.name as prov_name, d.name as dist_name,
-               COALESCE(SUM(max_vc), 0) as total_victims,
-               COUNT(*) as incident_count
+        SELECT p.name as prov_name, d.id as dist_id, d.name as dist_name,
+               COALESCE(SUM(ui.victim_count), 0) as total_victims,
+               COUNT(ui.id) as incident_count
         FROM districts d
         JOIN provinces p ON d.province_id = p.id
-        JOIN (
-            SELECT province_id, district_id,
-                   MAX(victim_count) as max_vc
-            FROM incidents
-            WHERE victim_count > 0
-            GROUP BY province_id, district_id, TO_CHAR(incident_date, 'YYYY-MM')
-        ) i ON i.province_id = d.province_id AND i.district_id = d.id
-        GROUP BY p.name, d.name
+        LEFT JOIN unique_incidents ui ON ui.district_id = d.id
+        GROUP BY p.name, d.id, d.name
     """)
     dist_stats = {}
     for row in cur.fetchall():
-        prov, dist, victims, incidents = row
+        prov, dist_id, dist, victims, incidents = row
         if prov not in dist_stats:
             dist_stats[prov] = {}
-        dist_stats[prov][dist] = {'victims': victims, 'incidents': incidents}
+        dist_stats[prov][dist] = {'id': dist_id, 'victims': victims, 'incidents': incidents, 'articles': 0}
+
+    # Add raw article count per district
+    cur.execute("""
+        SELECT p.name as prov_name, d.name as dist_name, COUNT(i.id) as article_count
+        FROM districts d
+        JOIN provinces p ON d.province_id = p.id
+        JOIN incidents i ON i.district_id = d.id
+        GROUP BY p.name, d.name
+    """)
+    for row in cur.fetchall():
+        prov, dist, articles = row
+        if prov in dist_stats and dist in dist_stats[prov]:
+            dist_stats[prov][dist]['articles'] = articles
 
     # Max victims for color scale
     max_victims = max((v['victims'] for v in prov_stats.values()), default=1)
@@ -157,12 +159,14 @@ def main():
 
             for feat in gj['features']:
                 kab_name = feat['properties'].get('WADMKK', '')
-                stats = prov_dists.get(kab_name, {'victims': 0, 'incidents': 0})
+                stats = prov_dists.get(kab_name, {'id': None, 'victims': 0, 'incidents': 0, 'articles': 0})
                 feat['properties']['kab_name'] = kab_name
+                feat['properties']['kab_id'] = stats.get('id')
                 feat['properties']['prov_name'] = prov_name
                 feat['properties']['prov_code'] = prov_code
                 feat['properties']['victims'] = stats['victims']
                 feat['properties']['incidents'] = stats['incidents']
+                feat['properties']['articles'] = stats.get('articles', 0)
                 feat['properties']['intensity'] = round(stats['victims'] / max_dist_victims, 4) if max_dist_victims > 0 else 0
                 merged_features.append(feat)
 

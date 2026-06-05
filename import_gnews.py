@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Insert Google News RSS articles into database"""
+import os
 import requests, re, time, json
 import xml.etree.ElementTree as ET
 from datetime import datetime
@@ -14,7 +15,7 @@ session.headers.update(HEADERS)
 
 DB_CONFIG = {
     'host': 'localhost', 'port': 5432, 'user': 'postgres',
-    'password': '***REDACTED***', 'dbname': 'korbanmbg',
+    'password': os.environ.get('DB_PASS', ''), 'dbname': 'korbanmbg',
 }
 
 LOCATION_MAP = {
@@ -256,8 +257,8 @@ def main():
 
     # Update aggregate data with new figures
     new_aggregates = [
-        ('UGM/Kompas.id: 33.626 pelajar keracunan MBG (Jan 2025 - Apr 2026)', 'UGM', 33626,
-         '2025-01-06', '2026-04-09', 'Sumber: Kompas.id 9 Apr 2026, UGM 24 Apr 2026'),
+        ('JPPI: 33.626 pelajar keracunan MBG (Jan 2025 - Apr 2026)', 'JPPI', 33626,
+         '2025-01-06', '2026-04-09', 'Hasil monitoring Jaringan Pemantau Pendidikan Indonesia (JPPI), dilaporkan Kompas.id 9 Apr 2026. UGM (Prof Sri Raharjo) memberi analisa terpisah, bukan sumber data.'),
         ('JPPI: 16.109 korban keracunan MBG per 31 Oktober 2025', 'JPPI', 16109,
          '2025-01-06', '2025-10-31', 'Update dari 11.566. Sumber: Tempo.co'),
         ('Prabowo: 28.000 siswa keracunan MBG (Feb 2026)', 'Presiden', 28000,

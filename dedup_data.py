@@ -5,13 +5,14 @@ For each cluster of articles about the same incident (same province + district +
 keep only the highest victim_count on one article, set the rest to 0.
 Also marks articles that are clearly cumulative national reports.
 """
+import os
 import psycopg2
 
 DB_CONFIG = {
     'host': 'localhost',
     'port': 5432,
     'user': 'postgres',
-    'password': '***REDACTED***',
+    'password': os.environ.get('DB_PASS', ''),
     'dbname': 'korbanmbg',
 }
 

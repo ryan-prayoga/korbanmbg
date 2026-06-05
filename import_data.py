@@ -4,6 +4,7 @@ Import MBG dataset into PostgreSQL database
 """
 
 import json
+import os
 import re
 import psycopg2
 from datetime import datetime
@@ -12,7 +13,7 @@ DB_CONFIG = {
     'host': 'localhost',
     'port': 5432,
     'user': 'postgres',
-    'password': '***REDACTED***',
+    'password': os.environ.get('DB_PASS', ''),
     'dbname': 'korbanmbg',
 }
 

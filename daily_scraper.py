@@ -6,6 +6,7 @@ Run via cron: 0 6 * * * /usr/bin/python3 /home/ubuntu/projects/korbanmbg/daily_s
 """
 
 import json
+import os
 import re
 import time
 import requests
@@ -17,7 +18,7 @@ DB_CONFIG = {
     'host': 'localhost',
     'port': 5432,
     'user': 'postgres',
-    'password': '***REDACTED***',
+    'password': os.environ.get('DB_PASS', ''),
     'dbname': 'korbanmbg',
 }
 

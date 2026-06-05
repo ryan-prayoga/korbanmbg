@@ -8,6 +8,7 @@ Strategy:
 - The dedup logic for STATISTICS is handled separately at query time (MAX per incident cluster)
 - This makes the list view useful — every article shows its reported number
 """
+import os
 import psycopg2
 import re
 
@@ -15,7 +16,7 @@ DB_CONFIG = {
     'host': 'localhost',
     'port': 5432,
     'user': 'postgres',
-    'password': '***REDACTED***',
+    'password': os.environ.get('DB_PASS', ''),
     'dbname': 'korbanmbg',
 }
 

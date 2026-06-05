@@ -5,6 +5,7 @@ Targets: Kompas, CNN Indonesia, Tempo, Republika, media lokal
 Uses different search approach to avoid blocks.
 """
 import json
+import os
 import re
 import time
 import requests
@@ -16,7 +17,7 @@ DB_CONFIG = {
     'host': 'localhost',
     'port': 5432,
     'user': 'postgres',
-    'password': '***REDACTED***',
+    'password': os.environ.get('DB_PASS', ''),
     'dbname': 'korbanmbg',
 }
 

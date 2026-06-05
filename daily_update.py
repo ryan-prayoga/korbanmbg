@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Daily auto-update: fetch new articles from Google News RSS, then rebuild unique_incidents."""
+import os
 import subprocess
 import sys
 import psycopg2
@@ -7,7 +8,7 @@ from datetime import datetime
 
 DB_CONFIG = {
     'host': 'localhost', 'port': 5432, 'user': 'postgres',
-    'password': '***REDACTED***', 'dbname': 'korbanmbg',
+    'password': os.environ.get('DB_PASS', ''), 'dbname': 'korbanmbg',
 }
 
 def run_import():
