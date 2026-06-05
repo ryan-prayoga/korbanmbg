@@ -2,16 +2,8 @@ module.exports = {
   apps: [
     {
       name: 'korbanmbg-api',
-      script: './api/korbanmbg-api',
+      script: './api/start.sh',
       cwd: '/home/ubuntu/projects/korbanmbg',
-      env: {
-        PORT: '8090',
-        DB_HOST: 'localhost',
-        DB_PORT: '5432',
-        DB_USER: 'postgres',
-        DB_PASS: process.env.DB_PASS || '',
-        DB_NAME: 'korbanmbg',
-      },
     },
     {
       name: 'korbanmbg-web',
