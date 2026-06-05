@@ -4,3 +4,7 @@ build/
 *.env
 geodata/geojson-indonesia.zip
 geodata/geojson/
+api/korbanmbg-api
+*.fiber.gz
+run_daily_update.sh
+.opencode
