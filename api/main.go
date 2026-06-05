@@ -33,8 +33,16 @@ func main() {
 
 	// Middleware
 	app.Use(logger.New())
+
+	// CORS dibatasi ke domain sendiri. Frontend akses API via SSR & path relatif
+	// (same-origin), jadi pembatasan ini menutup embed/scrape lintas-origin tanpa
+	// memutus fungsi app. Override lewat env CORS_ALLOW_ORIGINS bila perlu.
+	corsOrigins := os.Getenv("CORS_ALLOW_ORIGINS")
+	if corsOrigins == "" {
+		corsOrigins = "https://korbanmbg.ryanprayoga.dev"
+	}
 	app.Use(cors.New(cors.Config{
-		AllowOrigins: "*",
+		AllowOrigins: corsOrigins,
 		AllowHeaders: "Origin, Content-Type, Accept, Authorization",
 	}))
 
@@ -56,12 +64,15 @@ func main() {
 	api.Get("/timeline", h.GetTimeline)
 	api.Get("/sources", h.GetSources)
 
-	// GeoJSON endpoints (both paths for compatibility)
-	app.Static("/geodata", "/home/ubuntu/projects/korbanmbg/geodata/processed", fiber.Static{
+	geoDir := os.Getenv("GEODATA_DIR")
+	if geoDir == "" {
+		geoDir = "/home/ubuntu/projects/korbanmbg/geodata/processed"
+	}
+	app.Static("/geodata", geoDir, fiber.Static{
 		Compress: true,
 		Browse:   false,
 	})
-	app.Static("/api/geodata", "/home/ubuntu/projects/korbanmbg/geodata/processed", fiber.Static{
+	app.Static("/api/geodata", geoDir, fiber.Static{
 		Compress: true,
 		Browse:   false,
 	})
