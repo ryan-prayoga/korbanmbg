@@ -20,15 +20,23 @@ export async function load({ fetch, url }) {
 	const [incidentsRes, provincesRes] = await Promise.all([
 		fetch(`${API_BASE}/incidents?${params}`),
 		fetch(`${API_BASE}/provinces`),
-	]);
+	]).catch(() => [null, null] as const);
+
+	const incidents = incidentsRes && incidentsRes.ok
+		? await incidentsRes.json()
+		: { data: [], total: 0, page: parseInt(page), limit: 20 };
+	const provinces = provincesRes && provincesRes.ok
+		? await provincesRes.json()
+		: [];
 
 	return {
-		incidents: await incidentsRes.json(),
-		provinces: await provincesRes.json(),
+		incidents,
+		provinces,
 		currentPage: parseInt(page),
 		selectedProvince: province_id,
 		selectedDistrict: district_id,
 		query: q,
 		sort,
+		apiError: !incidentsRes || !incidentsRes.ok,
 	};
 }

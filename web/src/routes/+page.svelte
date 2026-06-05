@@ -33,6 +33,13 @@
 		const [y, m, day] = d.split('-');
 		return `${parseInt(day)} ${monthNames[parseInt(m) - 1]} ${y}`;
 	}
+
+	// "last_updated" = waktu artikel terbaru masuk (MAX created_at), bukan waktu rebuild.
+	function fmtLastUpdated(s: string): string {
+		if (!s) return '';
+		const [date] = s.split(' ');
+		return fmtDate(date);
+	}
 </script>
 
 <svelte:head>
@@ -211,5 +218,10 @@
 			Satu insiden bisa diliput oleh banyak media — kami deduplikasi untuk menghindari penghitungan ganda.
 			<a href="/tentang" class="text-[#e74c3c] hover:underline no-underline ml-1">Baca selengkapnya →</a>
 		</p>
+		{#if stats.last_updated}
+			<p class="text-[11px] text-[#666] mt-3 font-[JetBrains_Mono,monospace]">
+				Artikel terbaru: {fmtLastUpdated(stats.last_updated)}
+			</p>
+		{/if}
 	</section>
 </main>

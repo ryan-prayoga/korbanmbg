@@ -20,16 +20,15 @@ func New(db *pgxpool.Pool) *Handler {
 func (h *Handler) GetStats(c *fiber.Ctx) error {
 	ctx := context.Background()
 
-	var totalArticles, totalVictims, totalDeaths, totalHospitalized int
+	var totalArticles, totalVictims int
 	var provincesAffected, uniqueIncidentCount int
 	var lastUpdated string
 
 	// Count from unique_incidents (properly deduplicated)
 	h.db.QueryRow(ctx, `
-		SELECT COUNT(*), COALESCE(SUM(victim_count), 0),
-			   COALESCE(SUM(deaths), 0), COALESCE(SUM(hospitalized), 0)
+		SELECT COUNT(*), COALESCE(SUM(victim_count), 0)
 		FROM unique_incidents
-	`).Scan(&uniqueIncidentCount, &totalVictims, &totalDeaths, &totalHospitalized)
+	`).Scan(&uniqueIncidentCount, &totalVictims)
 
 	h.db.QueryRow(ctx, `SELECT COUNT(*) FROM incidents`).Scan(&totalArticles)
 
@@ -75,8 +74,6 @@ func (h *Handler) GetStats(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{
 		"total_articles":     totalArticles,
 		"total_victims":      totalVictims,
-		"total_deaths":       totalDeaths,
-		"total_hospitalized": totalHospitalized,
 		"provinces_affected": provincesAffected,
 		"unique_incidents":   uniqueIncidentCount,
 		"last_updated":       lastUpdated,

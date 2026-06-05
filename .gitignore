@@ -10,5 +10,7 @@ run_daily_update.sh
 .opencode
 __pycache__/
 .playwright-mcp/
-*.png
+/home-*.png
+/peta-*.png
 gnews_resolve.log
+!web/static/og.png

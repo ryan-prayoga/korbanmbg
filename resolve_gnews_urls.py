@@ -32,7 +32,26 @@ HEADERS = {
     "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
                   "(KHTML, like Gecko) Chrome/120 Safari/537.36",
 }
-DELAY = float(os.environ.get('GNEWS_DELAY', '1.2'))  # detik antar request
+DELAY = float(os.environ.get('GNEWS_DELAY', '4.0'))  # detik antar request
+MAX_RETRY = int(os.environ.get('GNEWS_RETRY', '5'))  # retry saat kena 429
+
+
+class RateLimited(Exception):
+    """Google membalas 429 walau sudah backoff maksimal."""
+
+
+def _get_with_backoff(url, timeout):
+    """GET dengan exponential backoff saat 429."""
+    wait = 30
+    for attempt in range(MAX_RETRY):
+        r = requests.get(url, headers=HEADERS, timeout=timeout)
+        if r.status_code != 429:
+            return r
+        print(f"    429 rate-limited, tunggu {wait}s (attempt {attempt+1}/{MAX_RETRY})",
+              flush=True)
+        time.sleep(wait)
+        wait = min(wait * 2, 300)  # cap 5 menit
+    raise RateLimited()
 
 
 def resolve(article_url, timeout=20):
@@ -42,7 +61,7 @@ def resolve(article_url, timeout=20):
         return None
     gn_id = m.group(1)
 
-    page = requests.get(f"{BASE}/articles/{gn_id}", headers=HEADERS, timeout=timeout)
+    page = _get_with_backoff(f"{BASE}/articles/{gn_id}", timeout)
     text = page.text
     sig_m = re.search(r'data-n-a-sg="([^"]+)"', text)
     ts_m = re.search(r'data-n-a-ts="([^"]+)"', text)
@@ -110,6 +129,10 @@ def main():
     for i, (inc_id, url) in enumerate(rows, 1):
         try:
             real = resolve(url)
+        except RateLimited:
+            print(f"  [{i}/{total}] STOP: Google rate-limit gigih. "
+                  f"Jalankan lagi nanti untuk resume sisanya.", flush=True)
+            break
         except Exception as e:
             real = None
             print(f"  [{i}/{total}] id={inc_id} ERR {e}", flush=True)

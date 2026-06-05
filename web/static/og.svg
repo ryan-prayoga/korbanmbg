@@ -1,0 +1,22 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" fill="#0f0f0f"/>
+  <rect x="0" y="0" width="1200" height="6" fill="#e74c3c"/>
+
+  <!-- brand -->
+  <circle cx="64" cy="74" r="7" fill="#e74c3c"/>
+  <text x="82" y="82" font-family="Inter, Arial, sans-serif" font-size="26" font-weight="700" fill="#e8e8e8">KorbanMBG</text>
+
+  <!-- label -->
+  <rect x="60" y="150" width="150" height="34" rx="6" fill="#e74c3c" fill-opacity="0.15"/>
+  <text x="74" y="173" font-family="Inter, Arial, sans-serif" font-size="17" font-weight="600" fill="#e74c3c" letter-spacing="1">DATA RESMI · JPPI</text>
+
+  <!-- big number -->
+  <text x="58" y="350" font-family="'JetBrains Mono', monospace, Courier" font-size="180" font-weight="800" fill="#e8e8e8">33.626</text>
+
+  <!-- subtitle -->
+  <text x="64" y="420" font-family="Inter, Arial, sans-serif" font-size="34" font-weight="500" fill="#888">pelajar diduga keracunan akibat program</text>
+  <text x="64" y="466" font-family="Inter, Arial, sans-serif" font-size="34" font-weight="500" fill="#888">Makan Bergizi Gratis sejak Januari 2025</text>
+
+  <!-- footer -->
+  <text x="64" y="568" font-family="Inter, Arial, sans-serif" font-size="22" fill="#666">Pemantau independen · non-partisan · korbanmbg.ryanprayoga.dev</text>
+</svg>

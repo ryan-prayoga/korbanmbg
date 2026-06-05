@@ -30,7 +30,11 @@
 	<meta property="og:type" content="website">
 	<meta property="og:site_name" content="KorbanMBG">
 	<meta property="og:locale" content="id_ID">
-	<meta name="twitter:card" content="summary">
+	<meta property="og:image" content="https://korbanmbg.ryanprayoga.dev/og.png">
+	<meta property="og:image:width" content="1200">
+	<meta property="og:image:height" content="630">
+	<meta name="twitter:card" content="summary_large_image">
+	<meta name="twitter:image" content="https://korbanmbg.ryanprayoga.dev/og.png">
 </svelte:head>
 
 <div class="min-h-screen bg-[#0f0f0f] text-[#e8e8e8] font-[Inter,-apple-system,sans-serif]">
