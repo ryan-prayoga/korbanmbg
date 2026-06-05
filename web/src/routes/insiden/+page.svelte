@@ -28,6 +28,13 @@
 			return '';
 		}
 	}
+
+	const bulan = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+	function fmtDate(d: string): string {
+		if (!d) return '';
+		const [y, m, day] = d.split('-');
+		return `${parseInt(day)} ${bulan[parseInt(m) - 1]} ${y}`;
+	}
 </script>
 
 <svelte:head>
@@ -87,7 +94,7 @@
 		{#each data.incidents.data || [] as incident}
 			<div class="flex justify-between items-start gap-3 py-4 border-b border-[#2a2a2a] -mx-3 px-3 rounded hover:bg-[#1a1a1a] transition-colors">
 				<div class="flex-1 min-w-0">
-					<div class="text-[14px] font-medium leading-snug text-[#e8e8e8]">{incident.title}</div>
+					<a href="/insiden/{incident.id}" class="text-[14px] font-medium leading-snug text-[#e8e8e8] hover:text-[#e74c3c] no-underline transition-colors">{incident.title}</a>
 					<div class="flex flex-wrap gap-1.5 mt-2">
 						{#if incident.province}
 							<span class="text-[11px] px-2 py-0.5 rounded bg-[#242424] text-[#888] border border-[#2a2a2a]">{incident.province}</span>
@@ -95,9 +102,9 @@
 						{#if incident.district}
 							<span class="text-[11px] px-2 py-0.5 rounded bg-[#242424] text-[#888] border border-[#2a2a2a]">{incident.district}</span>
 						{/if}
-						{#if incident.incident_date}
-							<span class="text-[11px] px-2 py-0.5 rounded bg-[#242424] text-[#888] border border-[#2a2a2a]">{incident.incident_date}</span>
-						{/if}
+					{#if incident.incident_date}
+						<span class="text-[11px] px-2 py-0.5 rounded bg-[#242424] text-[#888] border border-[#2a2a2a]">{fmtDate(incident.incident_date)}</span>
+					{/if}
 					</div>
 					{#if incident.source_url}
 						<a

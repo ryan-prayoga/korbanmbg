@@ -37,9 +37,8 @@
 					Angka utama yang ditampilkan di halaman depan berasal dari sumber otoritatif:
 				</p>
 				<ul class="text-[13px] text-[#888] mt-2 space-y-1 list-disc list-inside">
-					<li><strong>UGM/Kompas.id</strong> — 33.626 pelajar keracunan (per April 2026)</li>
+					<li><strong>JPPI</strong> — 33.626 pelajar keracunan (per April 2026, dilaporkan Kompas.id)</li>
 					<li><strong>Presiden Prabowo</strong> — mengakui 28.000 siswa keracunan (Februari 2026)</li>
-					<li><strong>JPPI</strong> — 16.109 korban (per Oktober 2025)</li>
 					<li><strong>KPAI</strong> — 12.658 anak di 38 provinsi (per akhir 2025)</li>
 					<li><strong>BGN</strong> — 4.711 → 11.640 korban (September–November 2025)</li>
 				</ul>
@@ -118,6 +117,6 @@
 
 	<!-- Last updated -->
 	<div class="text-[12px] text-[#666] border-t border-[#2a2a2a] pt-4">
-		Terakhir diperbarui: Mei 2026 · Data bersifat terbuka dan dapat diverifikasi
+		Diperbarui otomatis setiap hari · Data bersifat terbuka dan dapat diverifikasi
 	</div>
 </main>

@@ -89,6 +89,7 @@ func (h *Handler) GetIncidents(c *fiber.Ctx) error {
 	page, _ := strconv.Atoi(c.Query("page", "1"))
 	limit, _ := strconv.Atoi(c.Query("limit", "20"))
 	provinceID := c.Query("province_id")
+	districtID := c.Query("district_id")
 	sortBy := c.Query("sort", "incident_date")
 	order := c.Query("order", "DESC")
 	searchQ := c.Query("q", "")
@@ -123,6 +124,13 @@ func (h *Handler) GetIncidents(c *fiber.Ctx) error {
 		where += " AND i.province_id = $" + strconv.Itoa(argIdx)
 		pid, _ := strconv.Atoi(provinceID)
 		args = append(args, pid)
+		argIdx++
+	}
+
+	if districtID != "" {
+		where += " AND i.district_id = $" + strconv.Itoa(argIdx)
+		did, _ := strconv.Atoi(districtID)
+		args = append(args, did)
 		argIdx++
 	}
 

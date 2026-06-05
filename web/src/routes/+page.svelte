@@ -8,10 +8,18 @@
 
 	// Use official figure as headline (highest authoritative source)
 	const officialFigures = stats.official_figures || [];
-	const headlineFigure = officialFigures[0]; // Highest (UGM: 33,626)
+	const headlineFigure = officialFigures[0]; // Highest (JPPI: 33,626 — dilaporkan Kompas.id 9 Apr 2026)
 	const totalVictims = headlineFigure ? headlineFigure.total : stats.total_victims;
 	const headlineSource = headlineFigure?.org || 'Data agregasi';
-	const maxVictims = Math.max(...(timeline || []).map((t: any) => t.total_victims), 1);
+
+	// Trim leading/trailing months that are noise (0 korban + ≤1 insiden)
+	const rawTimeline = (timeline || []) as any[];
+	function isNoise(t: any): boolean { return (t.total_victims || 0) === 0 && (t.incident_count || 0) <= 1; }
+	let _start = 0, _end = rawTimeline.length;
+	while (_start < _end && isNoise(rawTimeline[_start])) _start++;
+	while (_end > _start && isNoise(rawTimeline[_end - 1])) _end--;
+	const displayTimeline = rawTimeline.slice(_start, _end);
+	const maxVictims = Math.max(...displayTimeline.map((t: any) => t.total_victims), 1);
 
 	const monthNames = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
 	function fmtMonth(m: string): string {
@@ -19,11 +27,20 @@
 		const [y, mo] = m.split('-');
 		return `${monthNames[parseInt(mo) - 1]} ${y.slice(2)}`;
 	}
+
+	function fmtDate(d: string): string {
+		if (!d) return '';
+		const [y, m, day] = d.split('-');
+		return `${parseInt(day)} ${monthNames[parseInt(m) - 1]} ${y}`;
+	}
 </script>
 
 <svelte:head>
 	<title>KorbanMBG — Pemantau Korban Makan Bergizi Gratis</title>
 	<meta name="description" content="Dokumentasi kasus keracunan program Makan Bergizi Gratis (MBG) di Indonesia berdasarkan data resmi." />
+	<meta property="og:title" content="KorbanMBG — Pemantau Korban Makan Bergizi Gratis">
+	<meta property="og:description" content="33.626 pelajar keracunan akibat MBG. Data dari JPPI, KPAI, BGN. Independen, non-partisan.">
+	<meta property="og:url" content="https://korbanmbg.ryanprayoga.dev">
 </svelte:head>
 
 <main class="max-w-[960px] mx-auto px-5 py-10">
@@ -39,24 +56,13 @@
 		<p class="text-[15px] text-[#888] mt-3 max-w-[500px]">
 			pelajar keracunan akibat program Makan Bergizi Gratis sejak Januari 2025
 		</p>
-		<div class="flex flex-wrap gap-2 mt-3">
-			<span class="inline-block text-[11px] font-[JetBrains_Mono,monospace] text-[#888] bg-[#1a1a1a] px-2 py-1 rounded border border-[#2a2a2a]">
-				{stats.unique_incidents} insiden terverifikasi
-			</span>
-			<span class="inline-block text-[11px] font-[JetBrains_Mono,monospace] text-[#888] bg-[#1a1a1a] px-2 py-1 rounded border border-[#2a2a2a]">
-				{stats.provinces_affected} provinsi terdampak
-			</span>
-			<span class="inline-block text-[11px] font-[JetBrains_Mono,monospace] text-[#888] bg-[#1a1a1a] px-2 py-1 rounded border border-[#2a2a2a]">
-				{fmt(stats.total_articles)} artikel berita
-			</span>
-		</div>
 	</section>
 
 	<!-- Stat grid -->
 	<section class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-12">
 		<div class="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-5">
-			<div class="text-[28px] font-bold font-[JetBrains_Mono,monospace] text-[#e74c3c]">{fmt(totalVictims)}</div>
-			<div class="text-[12px] text-[#888] mt-1">Total korban (resmi)</div>
+			<div class="text-[28px] font-bold font-[JetBrains_Mono,monospace] text-[#e74c3c]">{fmt(stats.total_victims)}</div>
+			<div class="text-[12px] text-[#888] mt-1">Korban (agregasi berita)</div>
 		</div>
 		<div class="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-5">
 			<div class="text-[28px] font-bold font-[JetBrains_Mono,monospace]">{stats.unique_incidents}</div>
@@ -76,13 +82,13 @@
 	<section class="mb-12">
 		<div class="flex justify-between items-baseline mb-4">
 			<h2 class="text-[16px] font-semibold">Korban per Bulan</h2>
-			<span class="text-[12px] text-[#888]">Jan 2025 — Mei 2026</span>
+			<span class="text-[12px] text-[#888]">{displayTimeline[0] ? fmtMonth(displayTimeline[0].month) : ''} — {displayTimeline[displayTimeline.length - 1] ? fmtMonth(displayTimeline[displayTimeline.length - 1].month) : ''}</span>
 		</div>
 		<div class="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-6">
 			<div class="flex items-end gap-1 h-[160px]">
-				{#each timeline || [] as entry, i}
+				{#each displayTimeline as entry, i}
 					{@const height = maxVictims > 0 ? Math.max(2, (entry.total_victims / maxVictims) * 100) : 2}
-					{@const isNewYear = i > 0 && entry.month.slice(0,4) !== (timeline[i-1]?.month || '').slice(0,4)}
+					{@const isNewYear = i > 0 && entry.month.slice(0,4) !== (displayTimeline[i-1]?.month || '').slice(0,4)}
 					<div class="flex-1 flex flex-col items-center h-full justify-end group relative {isNewYear ? 'border-l border-[#444] ml-1 pl-1' : ''}">
 						<!-- Value label on top -->
 						<span class="text-[9px] text-[#888] font-[JetBrains_Mono,monospace] mb-1 {entry.total_victims > 0 ? '' : 'invisible'}">
@@ -103,8 +109,8 @@
 			</div>
 			<!-- Month labels row -->
 			<div class="flex gap-1 mt-2 border-t border-[#2a2a2a] pt-2">
-				{#each timeline || [] as entry, i}
-					{@const isNewYear = i > 0 && entry.month.slice(0,4) !== (timeline[i-1]?.month || '').slice(0,4)}
+				{#each displayTimeline as entry, i}
+					{@const isNewYear = i > 0 && entry.month.slice(0,4) !== (displayTimeline[i-1]?.month || '').slice(0,4)}
 					<div class="flex-1 text-center {isNewYear ? 'border-l border-[#444] ml-1 pl-1' : ''}">
 						<span class="text-[9px] text-[#ccc] font-[JetBrains_Mono,monospace] block">
 							{monthNames[parseInt(entry.month.slice(5)) - 1]}
@@ -114,9 +120,9 @@
 			</div>
 			<!-- Year labels row -->
 			<div class="flex gap-1 mt-1">
-				{#each timeline || [] as entry, i}
+				{#each displayTimeline as entry, i}
 					{@const year = entry.month.slice(0,4)}
-					{@const isFirstOfYear = i === 0 || year !== (timeline[i-1]?.month || '').slice(0,4)}
+					{@const isFirstOfYear = i === 0 || year !== (displayTimeline[i-1]?.month || '').slice(0,4)}
 					<div class="flex-1 text-center">
 						{#if isFirstOfYear}
 							<span class="text-[10px] text-[#e74c3c] font-semibold font-[JetBrains_Mono,monospace]">
@@ -180,7 +186,7 @@
 						<span class="text-[10px] text-[#666]">↗ Lihat sumber</span>
 					</div>
 					<div class="text-[24px] font-bold font-[JetBrains_Mono,monospace]">{fmt(source.total)}</div>
-					<div class="text-[11px] text-[#888] mt-1">Per {source.period_end}</div>
+					<div class="text-[11px] text-[#888] mt-1">Per {fmtDate(source.period_end)}</div>
 					<p class="text-[11px] text-[#888] mt-2 leading-relaxed">{source.notes}</p>
 				</a>
 			{/each}
@@ -191,7 +197,7 @@
 	<section class="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg p-6">
 		<h3 class="text-[14px] font-semibold mb-2">Catatan Metodologi</h3>
 		<p class="text-[12px] text-[#888] leading-relaxed">
-			Angka headline menggunakan data resmi dari sumber otoritatif (UGM, KPAI, BGN, JPPI). 
+			Angka headline menggunakan data resmi dari sumber otoritatif (JPPI, KPAI, BGN, pernyataan Presiden). 
 			Data insiden dikumpulkan dari {fmt(stats.total_articles)} artikel berita yang dikelompokkan menjadi 
 			{stats.unique_incidents} insiden unik berdasarkan lokasi dan tanggal kejadian. 
 			Satu insiden bisa diliput oleh banyak media — kami deduplikasi untuk menghindari penghitungan ganda.

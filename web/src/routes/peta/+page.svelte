@@ -4,6 +4,7 @@
 
 	let mapContainer: HTMLDivElement;
 	let selectedProv = $state<{ code: string; name: string; victims: number; incidents: number } | null>(null);
+	let mapLoading = $state(true);
 
 	function fmt(n: number): string {
 		return n.toLocaleString('id-ID');
@@ -26,7 +27,7 @@
 
 		const map = L.map(mapContainer, {
 			zoomControl: false,
-			attributionControl: false,
+			attributionControl: true,
 		}).setView([-2.5, 118], 5);
 
 		L.control.zoom({ position: 'bottomright' }).addTo(map);
@@ -43,18 +44,25 @@
 		const provGJ = await provRes.json();
 
 		provLayer = L.geoJSON(provGJ, {
-			style: (feature: any) => ({
-				fillColor: getColor(feature.properties.intensity),
-				fillOpacity: feature.properties.victims > 0 ? 0.75 : 0.2,
-				color: '#333',
-				weight: 0.8,
-				opacity: 0.8,
-			}),
+			style: (feature: any) => {
+				const v = feature.properties.victims || 0;
+				return {
+					fillColor: v > 0 ? getColor(feature.properties.intensity) : '#1a1a1a',
+					fillOpacity: v > 0 ? 0.75 : 0.15,
+					color: '#2a2a2a',
+					weight: 0.8,
+					opacity: 0.8,
+				};
+			},
 			onEachFeature: (feature: any, layer: any) => {
 				const p = feature.properties;
 				layer.on({
 					mouseover: (e: any) => {
-						e.target.setStyle({ weight: 2, color: '#e74c3c', fillOpacity: 0.9 });
+						if (p.victims > 0) {
+							e.target.setStyle({ weight: 2, color: '#e74c3c', fillOpacity: 0.9 });
+						} else {
+							e.target.setStyle({ weight: 1.2, color: '#666', fillOpacity: 0.3 });
+						}
 					},
 					mouseout: (e: any) => {
 						provLayer.resetStyle(e.target);
@@ -76,34 +84,67 @@
 							const kabGJ = await kabRes.json();
 
 							kabLayer = L.geoJSON(kabGJ, {
-								style: (feat: any) => ({
-									fillColor: getColor(feat.properties.intensity),
-									fillOpacity: feat.properties.victims > 0 ? 0.8 : 0.15,
-									color: '#555',
-									weight: 0.6,
-									opacity: 0.8,
-								}),
+								style: (feat: any) => {
+									const v = feat.properties.victims || 0;
+									if (v === 0) {
+										return {
+											fillColor: '#1a1a1a',
+											fillOpacity: 0.4,
+											color: '#2a2a2a',
+											weight: 0.4,
+											opacity: 0.5,
+										};
+									}
+									return {
+										fillColor: getColor(feat.properties.intensity),
+										fillOpacity: 0.85,
+										color: '#e74c3c',
+										weight: 1,
+										opacity: 0.9,
+									};
+								},
 								onEachFeature: (feat: any, lyr: any) => {
 									const kp = feat.properties;
 									lyr.on({
 										mouseover: (ev: any) => {
-											ev.target.setStyle({ weight: 2, color: '#e74c3c', fillOpacity: 0.95 });
+											if (kp.victims > 0) {
+												ev.target.setStyle({ weight: 2, color: '#e74c3c', fillOpacity: 0.95 });
+											} else {
+												ev.target.setStyle({ weight: 1.2, color: '#666', fillOpacity: 0.25 });
+											}
 										},
 										mouseout: (ev: any) => {
 											kabLayer.resetStyle(ev.target);
 										},
 									});
 									if (kp.victims > 0) {
+										const provId = data.provinces.find((pv: any) => pv.name === kp.prov_name)?.id || '';
+										const incidentUrl = kp.kab_id
+											? `/insiden?province=${provId}&district=${kp.kab_id}`
+											: `/insiden?province=${provId}`;
+										const articleCount = kp.articles || kp.incidents;
 										lyr.bindPopup(`
-											<div style="font-family:Inter,sans-serif;font-size:12px;line-height:1.6;color:#1a1a1a;min-width:140px">
-												<strong style="font-size:13px">${kp.kab_name}</strong><br>
-												<span style="color:#888">${kp.prov_name}</span><br>
-												<span style="color:#e74c3c;font-weight:700;font-size:16px">${fmt(kp.victims)}</span> korban<br>
-												${kp.incidents} insiden
+											<div style="font-family:Inter,sans-serif;font-size:12px;line-height:1.6;min-width:160px">
+												<div style="color:#fff;font-weight:600;font-size:13px;margin-bottom:2px">${kp.kab_name}</div>
+												<div style="color:#888;font-size:11px;margin-bottom:8px">${kp.prov_name}</div>
+												<div style="margin-bottom:2px">
+													<span style="color:#e74c3c;font-weight:700;font-size:18px;font-family:'JetBrains Mono',monospace">${fmt(kp.victims)}</span>
+													<span style="color:#999;font-size:12px;margin-left:4px">korban</span>
+												</div>
+												<div style="color:#888;font-size:11px">${kp.incidents} insiden · ${articleCount} artikel</div>
+												<div style="margin-top:10px;padding-top:8px;border-top:1px solid #2a2a2a">
+													<a href="${incidentUrl}" style="color:#e74c3c;font-size:11px;font-weight:600;text-decoration:none">Lihat artikel →</a>
+												</div>
 											</div>
 										`);
 									} else {
-										lyr.bindTooltip(kp.kab_name, { sticky: true, className: 'kab-tooltip' });
+										lyr.bindPopup(`
+											<div style="font-family:Inter,sans-serif;font-size:12px;line-height:1.6;min-width:160px">
+												<div style="color:#fff;font-weight:600;font-size:13px;margin-bottom:2px">${kp.kab_name}</div>
+												<div style="color:#888;font-size:11px;margin-bottom:6px">${kp.prov_name}</div>
+												<div style="color:#666;font-size:11px;font-style:italic">Tidak ada laporan</div>
+											</div>
+										`);
 									}
 								},
 							}).addTo(map);
@@ -124,6 +165,7 @@
 				}
 			},
 		}).addTo(map);
+		mapLoading = false;
 
 		// Back button: click on map background resets to province view
 		map.on('click', (e: any) => {
@@ -146,7 +188,63 @@
 		.kab-tooltip { background: #1a1a1a; border: 1px solid #333; color: #e8e8e8; font-size: 11px; }
 		.leaflet-tooltip { background: #1a1a1a; border: 1px solid #333; color: #e8e8e8; font-size: 11px; box-shadow: none; }
 		.leaflet-tooltip::before { border-top-color: #333; }
-		.leaflet-control-attribution { display: none !important; }
+		.leaflet-control-attribution { background: rgba(15,15,15,0.85) !important; color: #555 !important; font-size: 9px !important; }
+		.leaflet-control-attribution a { color: #888 !important; }
+		/* Remove focus outline on SVG paths (the "border kotak" after click) */
+		.leaflet-interactive:focus { outline: none !important; }
+		path.leaflet-interactive { outline: none !important; }
+		/* Popup dark theme matching site palette */
+		.leaflet-popup {
+			margin-bottom: 20px !important;
+		}
+		.leaflet-popup-content-wrapper {
+			position: relative !important;
+			background: #0f0f0f !important;
+			color: #e8e8e8 !important;
+			border: 1px solid #2a2a2a !important;
+			border-radius: 8px !important;
+			box-shadow: 0 6px 24px rgba(0,0,0,0.7) !important;
+			padding: 14px 36px 14px 16px !important;
+			min-width: 180px !important;
+		}
+		.leaflet-popup-content {
+			margin: 0 !important;
+			line-height: 1.5 !important;
+			color: #e8e8e8 !important;
+			font-size: 12px !important;
+		}
+		.leaflet-popup-content strong { color: #ffffff !important; font-weight: 600 !important; }
+		.leaflet-popup-tip-container {
+			margin-top: -1px !important;
+		}
+		.leaflet-popup-tip {
+			background: #0f0f0f !important;
+			border: 1px solid #2a2a2a !important;
+			box-shadow: none !important;
+		}
+		.leaflet-popup-close-button {
+			position: absolute !important;
+			top: 8px !important;
+			right: 8px !important;
+			width: 22px !important;
+			height: 22px !important;
+			padding: 0 !important;
+			margin: 0 !important;
+			color: #888 !important;
+			font-size: 16px !important;
+			font-weight: 400 !important;
+			line-height: 22px !important;
+			text-align: center !important;
+			text-decoration: none !important;
+			border: none !important;
+			border-radius: 4px !important;
+			background: transparent !important;
+		}
+		.leaflet-popup-close-button:hover {
+			color: #e74c3c !important;
+			background: #1a1a1a !important;
+			text-decoration: none !important;
+		}
 	</style>
 </svelte:head>
 
@@ -198,8 +296,16 @@
 		</div>
 	{/if}
 
-	<div class="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg overflow-hidden mb-8">
-		<div bind:this={mapContainer} class="h-[450px] sm:h-[550px] w-full"></div>
+	<div class="bg-[#1a1a1a] border border-[#2a2a2a] rounded-lg overflow-hidden mb-8 relative">
+		{#if mapLoading}
+			<div class="h-[450px] sm:h-[550px] w-full flex items-center justify-center">
+				<div class="text-center">
+					<div class="w-8 h-8 border-2 border-[#e74c3c] border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+					<p class="text-[12px] text-[#888]">Memuat peta Indonesia...</p>
+				</div>
+			</div>
+		{/if}
+		<div bind:this={mapContainer} class="h-[450px] sm:h-[550px] w-full {mapLoading ? 'h-0' : ''}"></div>
 	</div>
 
 	<!-- Province table -->

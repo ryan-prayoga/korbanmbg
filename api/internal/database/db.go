@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"fmt"
+	"net/url"
 	"os"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -11,9 +12,10 @@ import (
 func Connect() (*pgxpool.Pool, error) {
 	dsn := os.Getenv("DATABASE_URL")
 	if dsn == "" {
+		pass := url.QueryEscape(getEnv("DB_PASS", ""))
 		dsn = fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable",
 			getEnv("DB_USER", "postgres"),
-			getEnv("DB_PASS", ""),
+			pass,
 			getEnv("DB_HOST", "localhost"),
 			getEnv("DB_PORT", "5432"),
 			getEnv("DB_NAME", "korbanmbg"),

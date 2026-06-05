@@ -23,9 +23,14 @@
 </script>
 
 <svelte:head>
+	<link rel="icon" type="image/svg+xml" href="/favicon.svg">
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
 	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+	<meta property="og:type" content="website">
+	<meta property="og:site_name" content="KorbanMBG">
+	<meta property="og:locale" content="id_ID">
+	<meta name="twitter:card" content="summary">
 </svelte:head>
 
 <div class="min-h-screen bg-[#0f0f0f] text-[#e8e8e8] font-[Inter,-apple-system,sans-serif]">

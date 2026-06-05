@@ -5,6 +5,13 @@
 	function fmt(n: number): string {
 		return n.toLocaleString('id-ID');
 	}
+
+	const bulan = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+	function fmtDate(d: string): string {
+		if (!d) return '';
+		const [y, m, day] = d.split('-');
+		return `${parseInt(day)} ${bulan[parseInt(m) - 1]} ${y}`;
+	}
 </script>
 
 <svelte:head>
@@ -25,7 +32,7 @@
 		<div class="flex flex-wrap gap-2 mt-4">
 			{#if incident.incident_date}
 				<span class="text-[11px] px-2 py-1 rounded bg-[#242424] text-[#888] border border-[#2a2a2a]">
-					{incident.incident_date}
+					{fmtDate(incident.incident_date)}
 				</span>
 			{/if}
 			{#if incident.province}
