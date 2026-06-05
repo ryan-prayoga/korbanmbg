@@ -33,6 +33,8 @@ func (h *Handler) GetStats(c *fiber.Ctx) error {
 
 	h.db.QueryRow(ctx, `SELECT COUNT(*) FROM incidents`).Scan(&totalArticles)
 
+	// "Terdampak" = punya minimal 1 insiden (terlepas korban sudah tercatat).
+	// Konsisten dengan GetProvinceStats yang juga menampilkan semua provinsi ber-insiden.
 	h.db.QueryRow(ctx, `
 		SELECT COUNT(DISTINCT province_id) FROM unique_incidents WHERE province_id IS NOT NULL
 	`).Scan(&provincesAffected)
@@ -274,8 +276,7 @@ func (h *Handler) GetProvinceStats(c *fiber.Ctx) error {
 		FROM provinces p
 		JOIN unique_incidents ui ON ui.province_id = p.id
 		GROUP BY p.id, p.name
-		HAVING SUM(ui.victim_count) > 0
-		ORDER BY total_victims DESC
+		ORDER BY total_victims DESC, incident_count DESC
 	`)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": err.Error()})

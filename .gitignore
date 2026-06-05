@@ -8,3 +8,7 @@ api/korbanmbg-api
 *.fiber.gz
 run_daily_update.sh
 .opencode
+__pycache__/
+.playwright-mcp/
+*.png
+gnews_resolve.log

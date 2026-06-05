@@ -46,15 +46,23 @@
 <main class="max-w-[960px] mx-auto px-5 py-10">
 	<!-- Hero stat -->
 	<section class="mb-12">
-		<div class="text-[13px] text-[#888] mb-2 flex items-center gap-2">
+		<div class="text-[13px] text-[#888] mb-2 flex items-center gap-2 flex-wrap">
 			<span class="text-[10px] bg-[rgba(231,76,60,0.15)] text-[#e74c3c] px-1.5 py-0.5 rounded font-semibold uppercase tracking-wide">Data Resmi</span>
 			Sumber: {headlineSource} ({headlineFigure?.period_end || ''})
 		</div>
 		<div class="text-[clamp(56px,12vw,96px)] font-extrabold leading-none tracking-tight font-[JetBrains_Mono,monospace]">
 			{fmt(totalVictims)}
 		</div>
-		<p class="text-[15px] text-[#888] mt-3 max-w-[500px]">
-			pelajar keracunan akibat program Makan Bergizi Gratis sejak Januari 2025
+		<p class="text-[15px] text-[#888] mt-3 max-w-[520px]">
+			pelajar diduga keracunan akibat program Makan Bergizi Gratis sejak Januari 2025
+		</p>
+		<p class="text-[12px] text-[#666] mt-3 max-w-[560px] leading-relaxed">
+			Angka headline adalah angka resmi tertinggi dari sumber otoritatif (JPPI).
+			Agregasi independen dari {fmt(stats.total_articles)} artikel berita menghasilkan
+			<span class="text-[#888] font-medium">{fmt(stats.total_victims)}</span> korban —
+			lebih tinggi karena mencakup insiden lokal yang belum terangkum dalam laporan resmi.
+			Sebagian besar kasus berstatus <span class="text-[#888]">diduga</span> dan belum tentu
+			terkonfirmasi medis. <a href="/tentang" class="text-[#e74c3c] no-underline hover:underline">Metodologi →</a>
 		</p>
 	</section>
 
