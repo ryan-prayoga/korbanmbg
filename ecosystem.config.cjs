@@ -9,7 +9,7 @@ module.exports = {
         DB_HOST: 'localhost',
         DB_PORT: '5432',
         DB_USER: 'postgres',
-        DB_PASS: '***REDACTED***',
+        DB_PASS: process.env.DB_PASS || '',
         DB_NAME: 'korbanmbg',
       },
     },
